@@ -4,8 +4,10 @@ A slide-by-slide deck mirroring `notes/` Modules 0–5. Each slide = **title + 3
 speaker-note paragraph**. ~48 slides → ~3–4 h with discussion, or trim Module 3 to one domain for a
 ~2 h focused session.
 
-**Recurring element — the "skeleton" slide.** Slides marked 🦴 re-show the universal pipeline
-diagram with the *current stage highlighted*, so the audience always knows where they are:
+**Recurring element — the "skeleton" slide.** Slides marked `[skeleton]` re-show the universal
+pipeline diagram with the *current stage highlighted*, so the audience always knows where they are.
+In the rendered deck (`deck.md`) these carry an **SVG `workflow` icon** — never an emoji — per the
+brandbook (`~/estudio/knowledge/brandbook.md` §5).
 ```
 Design → QC → Preprocess → [ALIGN ⟋ ASSEMBLE] → Downstream → Interpret → (Reproducibility wraps all)
 ```
@@ -28,7 +30,7 @@ Design → QC → Preprocess → [ALIGN ⟋ ASSEMBLE] → Downstream → Interpr
 - *Speaker note:* Name the pain — students drown memorizing tool zoos. Reframe: tools are
   implementations of stages; stages are stable. This is the whole thesis of the course.
 
-**Slide 3 — 🦴 The universal pipeline skeleton**
+**Slide 3 — [skeleton] The universal pipeline skeleton**
 - Design → QC → Preprocess → Core (align ⟋ assemble) → Downstream → Interpret → Reproducibility
 - Each junction is a FILE FORMAT
 - Front half shared; back half branches
@@ -46,7 +48,7 @@ Design → QC → Preprocess → [ALIGN ⟋ ASSEMBLE] → Downstream → Interpr
 
 ## Module 0 — Foundations (Slides 5–12)
 
-**Slide 5 — 🦴 Module 0: Foundations (stage: Design + formats)**
+**Slide 5 — [skeleton] Module 0: Foundations (stage: Design + formats)**
 - What a pipeline is; why we formalize it (reproducibility, scale, reasoning)
 - *Speaker note:* "Pipeline = plumbing; junctions are file formats." Most pain is format-wrangling.
 
@@ -90,7 +92,7 @@ Design → QC → Preprocess → [ALIGN ⟋ ASSEMBLE] → Downstream → Interpr
 
 ## Module 1 — QC & Preprocessing (Slides 13–18)
 
-**Slide 13 — 🦴 Module 1: QC & Preprocessing (stage highlighted)**
+**Slide 13 — [skeleton] Module 1: QC & Preprocessing (stage highlighted)**
 - Garbage in → garbage out; cheapest place to catch disaster
 - *Speaker note:* Raw FASTQ is NOT trustworthy raw material — adapters, low-qual tails, contaminants.
 
@@ -123,7 +125,7 @@ Design → QC → Preprocess → [ALIGN ⟋ ASSEMBLE] → Downstream → Interpr
 
 ## Module 2 — Core Processing: the fork (Slides 19–25)
 
-**Slide 19 — 🦴 Module 2: Core processing — THE BRANCH POINT**
+**Slide 19 — [skeleton] Module 2: Core processing — THE BRANCH POINT**
 - Align to a reference ⟋ Assemble de novo
 - Everything before = shared; everything after = diverges here
 - *Speaker note:* The single most important conceptual slide. Slow down.
@@ -162,7 +164,7 @@ Design → QC → Preprocess → [ALIGN ⟋ ASSEMBLE] → Downstream → Interpr
 
 ## Module 3a — Variant Calling (Slides 26–31)
 
-**Slide 26 — 🦴 Module 3a: Variant calling (ALIGN branch)**
+**Slide 26 — [skeleton] Module 3a: Variant calling (ALIGN branch)**
 - BAM → where & how does the sample differ → does it matter?
 - Germline vs somatic
 - *Speaker note:* This branch consumes the aligned BAM.
@@ -193,7 +195,7 @@ Design → QC → Preprocess → [ALIGN ⟋ ASSEMBLE] → Downstream → Interpr
 
 ## Module 3b — RNA-seq (Slides 32–37)
 
-**Slide 32 — 🦴 Module 3b: RNA-seq (ALIGN / pseudo-align)**
+**Slide 32 — [skeleton] Module 3b: RNA-seq (ALIGN / pseudo-align)**
 - Measure how much each gene is expressed; compare conditions
 - The twist: introns removed → reads span junctions
 - *Speaker note:* Why DNA aligners don't suffice for mRNA.
@@ -227,7 +229,7 @@ Design → QC → Preprocess → [ALIGN ⟋ ASSEMBLE] → Downstream → Interpr
 
 ## Module 3c — Phage / Metagenomics (Slides 38–43)
 
-**Slide 38 — 🦴 Module 3c: Phage/metagenomics (ASSEMBLE branch)**
+**Slide 38 — [skeleton] Module 3c: Phage/metagenomics (ASSEMBLE branch)**
 - All DNA in a sample; novel, uncultured genomes; no single reference
 - Lean: virome/phage
 - *Speaker note:* Why assemble not align — alignment only sees the known.
@@ -259,7 +261,7 @@ Design → QC → Preprocess → [ALIGN ⟋ ASSEMBLE] → Downstream → Interpr
 
 ## Module 4 — Interpretation & Reporting (Slides 44–46)
 
-**Slide 44 — 🦴 Module 4: Interpretation & reporting**
+**Slide 44 — [skeleton] Module 4: Interpretation & reporting**
 - Numbers → defensible biological claims
 - Visualize BEFORE you believe
 - *Speaker note:* Pipeline exiting 0 means it ran, not that it's right.
@@ -278,7 +280,7 @@ Design → QC → Preprocess → [ALIGN ⟋ ASSEMBLE] → Downstream → Interpr
 
 ## Module 5 — Reproducibility (Slides 47–49)
 
-**Slide 47 — 🦴 Module 5: Reproducibility wraps everything**
+**Slide 47 — [skeleton] Module 5: Reproducibility wraps everything**
 - Why a workflow manager: resume, parallelism, portability, reproducibility
 - *Speaker note:* Not a final step — the box around the whole skeleton.
 
@@ -299,5 +301,5 @@ Design → QC → Preprocess → [ALIGN ⟋ ASSEMBLE] → Downstream → Interpr
 - **Full survey:** all 49 slides, ~3–4 h with the checkpoint discussion beats.
 - **Focused session (~2 h):** Slides 1–25 + ONE of {3a, 3b, 3c} + 44–49. Drop the other two domain
   blocks.
-- The 🦴 skeleton slides are your navigation anchors — never skip them; they're how the audience
+- The [skeleton] skeleton slides are your navigation anchors — never skip them; they're how the audience
   keeps orientation across a long session.
