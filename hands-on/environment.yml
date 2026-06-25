@@ -1,0 +1,36 @@
+# Conda/mamba environment for the bioinfo-pipeline-class hands-on lab.
+#
+#   mamba env create -f environment.yml      # (or: conda env create -f environment.yml)
+#   conda activate bioinfo-class
+#
+# Versions are pinned for reproducibility (Module 5). If a build is unavailable on your platform,
+# relax the patch version (e.g. samtools=1.* ) — but record what you actually resolved with:
+#   mamba env export > environment.lock.yml
+#
+# Sized to run on a laptop with the small E. coli + phage dataset in tutorial.md.
+name: bioinfo-class
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  # --- data fetching / handling ---
+  - sra-tools=3.1.1          # prefetch / fasterq-dump (optional: pull reads from SRA)
+  - seqkit=2.8.2             # FASTA/FASTQ swiss-army knife (subsample, stats)
+  - wget                     # download reference genomes
+  # --- Module 1: QC & preprocessing ---
+  - fastqc=0.12.1
+  - multiqc=1.21
+  - fastp=0.23.4
+  # --- Module 2: core processing (align + assemble) ---
+  - bwa=0.7.18               # short-read aligner (E. coli reference-based pass)
+  - minimap2=2.28            # long-read / general aligner
+  - samtools=1.20            # sort / index / flagstat / faidx
+  - spades=3.15.5            # de novo assembly (phage genome pass)
+  # --- Module 3a: variant calling (lab uses bcftools, lightweight) ---
+  - bcftools=1.20
+  # --- Module 3c: viral identification / QC (phage pass) ---
+  - checkv=1.0.1             # viral genome completeness/contamination
+  # NOTE: geNomad and Pharokka are heavier (large DBs). Install separately if you extend the lab:
+  #   mamba create -n genomad -c conda-forge -c bioconda genomad
+  #   mamba create -n pharokka -c conda-forge -c bioconda pharokka
+  # They are intentionally left out of the core env to keep the laptop install fast.
