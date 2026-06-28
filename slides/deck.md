@@ -278,7 +278,7 @@ Design → [QC] → [PREPROCESS] → Core → Downstream → Interpret → Repro
 
 - Garbage in → garbage out; **cheapest place to catch disaster**
 
-<!-- Raw FASTQ is NOT trustworthy raw material — adapters, low-qual tails, contaminants. GUI alternative (GTN): Quality Control → training.galaxyproject.org/training-material/topics/sequence-analysis/tutorials/quality-control/tutorial.html -->
+<!-- Raw FASTQ is NOT trustworthy raw material — adapters, low-qual tails, contaminants. GUI alternative (GTN): Quality Control (+ Nanoplot/PycoQC for long reads) and Quality & contamination control in a bacterial isolate → topics/sequence-analysis/tutorials/quality-control/ and .../quality-contamination-control/ -->
 
 ---
 
@@ -286,8 +286,9 @@ Design → [QC] → [PREPROCESS] → Core → Downstream → Interpret → Repro
 
 - Per-base quality · adapter content · overrepresented seqs · duplication · GC
 - Pass / Warn / Fail = a **prompt, not a verdict**
+- Make the GC second-peak explicit: **screen contamination** with Kraken2/Bracken
 
-<!-- "Read FastQC like a doctor reads a chart" — interpret in the context of the library type. -->
+<!-- "Read FastQC like a doctor reads a chart" — interpret in the context of the library type. A GC second peak only hints at contamination; a taxonomic screen (Kraken2) confirms the sample is your target species. Full profiling is Module 3c. -->
 
 ---
 
@@ -297,6 +298,20 @@ Design → [QC] → [PREPROCESS] → Core → Downstream → Interpret → Repro
 - The **outlier view** is the payoff
 
 <!-- Highest value / lowest effort tool in the course. Run it after every batch step. -->
+
+---
+
+<p class="eyebrow">MODULE 1 · LONG-READ QC</p>
+
+## Long reads need different QC tools
+
+- FastQC's plots assume **short, fixed-length** reads
+- **Nanoplot** — read-length × quality (the long-read analog of the FastQC panels)
+- **PycoQC** — Nanopore *run* health: per-channel activity, yield over time, basecall quality
+
+> Read-length distribution is the headline metric — a healthy ONT run is **long-tailed**.
+
+<!-- Module 0 spent three slides on ONT/PacBio, but QC tools so far were short-read only. Nanoplot is the everyday long-read QC; PycoQC reads the MinKNOW run. A collapse toward short reads = degraded input or failing pores. Long-read trimming/filtering (Porechop, filtlong) shows up in the Module 2 assembly workflow. -->
 
 ---
 
@@ -344,7 +359,7 @@ Design → QC → Preprocess → [ ALIGN / ASSEMBLE ] → Downstream → Interpr
 
 - Everything before = **shared**; everything after = **diverges here**
 
-<!-- The single most important conceptual slide. Slow down. GUI alternative (GTN): Mapping (align) + Genome Assembly intro (assemble) → topics/sequence-analysis/tutorials/mapping/ and topics/assembly/tutorials/general-introduction/ -->
+<!-- The single most important conceptual slide. Slow down. GUI alternative (GTN): Mapping (align) + Genome Assembly intro, MRSA Illumina/Nanopore, Hybrid assembly, and Assembly Quality Control (QUAST/BUSCO/Merqury) → topics/sequence-analysis/tutorials/mapping/ and topics/assembly/ -->
 
 ---
 
@@ -383,19 +398,35 @@ samtools index s.bam ; samtools flagstat s.bam
 ## De novo assembly
 
 - **SPAdes** (isolate/meta) · **MEGAHIT** (big metagenomes) · **Flye** (long read)
+- **Shovill** (SPAdes wrapper for bacterial isolates) · **Unicycler** (hybrid short+long)
 - de Bruijn graphs (short) vs overlap (long)
 
-<!-- No reference → reconstruct by overlap. Compute / memory heavy. -->
+<!-- No reference → reconstruct by overlap. Compute / memory heavy. Shovill is the pragmatic default for one short-read bacterial genome; when you have both Illumina and ONT, hybrid (Unicycler) beats either alone. -->
+
+---
+
+<p class="eyebrow">MODULE 2 · LONG-READ ASSEMBLY</p>
+
+## Long-read prep & polishing
+
+- **Prep first** — **Porechop** (adapters) + **filtlong** (keep best reads) + Nanoplot QC
+- **Polish after** — **Medaka** (ONT consensus) · **Pilon** / **Polypolish** (short reads)
+- Polishing lifts a raw **Flye** draft from ~Q30 to near-finished
+
+> Long-read drafts carry indel/homopolymer errors — polishing is not optional.
+
+<!-- Two steps short-read work doesn't have. Hybrid in disguise: long-read assemble, then short-read polish (Pilon/Polypolish) = the same short+long combination Unicycler automates. -->
 
 ---
 
 ## Judging an assembly: N50 & friends
 
 - **contig count** · **N50** (contiguity) · total length · completeness (BUSCO / CheckV)
+- **Merqury** (k-mer QV, reference-free) · **Bandage** (look at the assembly *graph*)
 
 > **N50 rewards length, not correctness** — always pair it with completeness.
 
-<!-- The "higher N50 but 71% complete" trap (returns in the checkpoint). -->
+<!-- The "higher N50 but 71% complete" trap (returns in the checkpoint). Merqury estimates consensus quality from read k-mers with no reference; Bandage shows tangles (repeats/contamination) the linear FASTA hides. -->
 
 ---
 
@@ -423,7 +454,7 @@ samtools index s.bam ; samtools flagstat s.bam
 
 - BAM → where & how does the sample differ → **does it matter?**
 
-<!-- This branch consumes the aligned BAM. Germline vs somatic. GUI alternative (GTN): Microbial Variant Calling (bacterial) / Exome-seq (clinical) → topics/variant-analysis/ -->
+<!-- This branch consumes the aligned BAM. Germline vs somatic. GUI alternative (GTN): Microbial Variant Calling (Snippy, bacterial), M. tuberculosis Variant Analysis (AMR/drug-resistance), Exome-seq (clinical) → topics/variant-analysis/ -->
 
 ---
 
@@ -442,10 +473,11 @@ BAM → MarkDuplicates → BQSR → HaplotypeCaller → joint genotyping → fil
 ## Alternative callers
 
 - **bcftools** — light / bacterial (used in the lab)
-- **DeepVariant** — deep-learning, strong on long reads
+- **Snippy** — bacterial all-in-one (align + call + effects); the microbial standard
+- **FreeBayes** — haplotype Bayesian; pooled / odd ploidy · **DeepVariant** — DL, long reads
 - **Mutect2** — somatic (tumor / normal)
 
-<!-- Right tool for scale. GATK's full arc is overkill on a phage / E. coli genome. -->
+<!-- Right tool for scale. GATK's full arc is overkill on a phage / E. coli genome. Snippy is the de-facto bacterial pipeline (the GTN microbial labs use it); FreeBayes is Snippy's engine and handles non-diploid samples. -->
 
 ---
 
@@ -459,6 +491,20 @@ chr7  ...  . G   A   312  PASS   DP=54  GT:AD:DP 0/1:27,27:54
 - **GT**: 0/0 hom-ref · 0/1 het · 1/1 hom-alt — DP / AD / GQ are trust signals
 
 <!-- Read one row aloud as a sentence. -->
+
+---
+
+<p class="eyebrow">MODULE 3a · BEFORE ANNOTATION</p>
+
+## Normalize variants first
+
+- The same indel can be written several equivalent ways
+- **`bcftools norm -f ref.fa -m -`** — left-align indels + split multi-allelic sites
+- Un-normalized → won't match **ClinVar / gnomAD** or another caller's VCF → annotation silently misses
+
+> A standard step in the GTN exome/somatic labs — do it before annotating or comparing VCFs.
+
+<!-- Easy to skip, quietly costly. Two callers can emit the "same" variant at different positions/representations; normalization makes them comparable and lets annotation databases match. -->
 
 ---
 
@@ -494,16 +540,30 @@ chr7  ...  . G   A   312  PASS   DP=54  GT:AD:DP 0/1:27,27:54
 
 - Measure how much each gene is expressed; the twist: **introns removed → reads span junctions**
 
-<!-- Why DNA aligners don't suffice for mRNA. GUI alternative (GTN): Reference-based RNA-Seq + reads-to-counts/counts-to-genes → topics/transcriptomics/ -->
+<!-- Why DNA aligners don't suffice for mRNA. GUI alternative (GTN): Reference-based RNA-Seq + reads-to-counts/counts-to-genes + genes-to-pathways (enrichment) → topics/transcriptomics/ -->
 
 ---
 
 ## Two routes to counts
 
-- **A** — spliced alignment (STAR / HISAT2) + featureCounts / HTSeq
+- **A** — spliced alignment (STAR / HISAT2) + featureCounts / HTSeq (or **DEXSeq** for exon usage)
 - **B** — pseudo-alignment (Salmon / kallisto) + tximport — the fast default
 
-<!-- Want counts for DE? Salmon. Need alignments (isoforms / RNA variants)? STAR. -->
+<!-- Want counts for DE? Salmon. Need alignments (isoforms / RNA variants, differential exon usage via DEXSeq)? STAR. -->
+
+---
+
+<p class="eyebrow">MODULE 3b · A COMMON TRAP</p>
+
+## Strandedness: the silent count-killer
+
+- Preps are unstranded / forward / reverse → `featureCounts -s 0/1/2` must match
+- Wrong setting → counts come back **near-zero** for every gene, **no error**
+- **Infer it first** — RSeQC *Infer Experiment* (or Salmon auto-detects)
+
+> The run "succeeds." The counts are garbage. Check strandedness before you count.
+
+<!-- A classic that wastes a day. Pseudo-aligners detect strandedness automatically — one less foot-gun. If a whole-experiment count matrix looks empty, suspect this first. -->
 
 ---
 
@@ -534,10 +594,11 @@ GENE_B      2      0       3       1
 
 ## Differential expression (DESeq2 / edgeR)
 
-- **Negative binomial**; size factors → dispersion → GLM → test
+- **Negative binomial** (DESeq2 / edgeR); size factors → dispersion → GLM → test
+- **limma-voom** — a third engine: log-CPM + precision weights, robust with many samples
 - Output: **log2FC** + **padj**; `lfcShrink` for stable effect sizes
 
-<!-- n ≥ 3 replicates floor; more replicates beat more depth. -->
+<!-- n ≥ 3 replicates floor; more replicates beat more depth. Any of the three is defensible — pick one and report it (limma-voom is the GTN default). -->
 
 ---
 
@@ -549,6 +610,20 @@ GENE_B      2      0       3       1
 > Significant ≠ meaningful (padj 1e-30, log2FC 0.08).
 
 <!-- The big idea. Don't rank by p-value alone. -->
+
+---
+
+<p class="eyebrow">MODULE 3b · FROM LIST TO BIOLOGY</p>
+
+## Functional enrichment
+
+- A DE table is a means, not the end — which **pathways / processes** moved?
+- **ORA** (goseq — RNA-seq length-aware) on the significant list
+- **GSEA** (fgsea) ranks *all* genes — catches many small coordinated shifts; **KEGG / Pathview** to map
+
+> The trap: use the right **background** (expressed genes, not the genome) and correct length bias.
+
+<!-- The missing downstream — the notes end at the gene list, real analysis continues here. ORA thresholds then tests over-representation; GSEA needs no threshold. goseq corrects the bias that makes long genes look enriched. -->
 
 ---
 
@@ -564,7 +639,7 @@ GENE_B      2      0       3       1
 
 - Novel, uncultured genomes; **no single reference** · lean: virome / phage
 
-<!-- Why assemble not align — alignment only sees the known. GUI alternative (GTN): Metagenomics assembly + Taxonomic profiling → topics/microbiome/ (phage/virome coverage thinner — geNomad/CheckV/Pharokka stay CLI primary) -->
+<!-- Why assemble not align — alignment only sees the known. GUI alternative (GTN): Metagenomics assembly + Binning (MAGs) + Host removal + Taxonomic profiling + Pathogen detection (Nanopore foodborne) → topics/microbiome/ (phage/virome coverage thinner — geNomad/CheckV/Pharokka stay CLI primary) -->
 
 ---
 
@@ -574,6 +649,20 @@ GENE_B      2      0       3       1
 - **metaSPAdes** / **MEGAHIT** / **Flye --meta**
 
 <!-- A phage prep is mostly host DNA; also a privacy step for human samples. -->
+
+---
+
+<p class="eyebrow">MODULE 3c · THE BACTERIAL SIDE</p>
+
+## Binning → MAGs
+
+- The same assembly feeds the **bacterial** side, not just viruses
+- **MetaBAT2 / MaxBin2** (bin) → **DAS Tool / Binette** (reconcile) → **CheckM** (quality) → **dRep** (de-dup)
+- Groups contigs into **MAGs** by tetranucleotide signature + coverage
+
+> CheckM is the bacterial analog of CheckV — completeness + contamination per genome.
+
+<!-- This module follows the viral contigs, but binning recovers the organisms. Reach for it when you want "who is here, as genomes," not just read-level taxonomy. -->
 
 ---
 
@@ -599,9 +688,10 @@ GENE_B      2      0       3       1
 ## Taxonomy: Kraken2 + Bracken
 
 - **Kraken2** classifies reads; **Bracken** re-estimates abundance
+- **MetaPhlAn** — marker-gene alternative (cleaner species/strain, smaller DB); cross-check
 - Database caveat: **novel phages = unclassified** (that's the interesting bit)
 
-<!-- Exactly why assembly + CheckV matters — characterize the unknown. -->
+<!-- Exactly why assembly + CheckV matters — characterize the unknown. Kraken2 = k-mer (sees everything in the DB); MetaPhlAn = clade markers (fewer spurious low-level hits). Visualize either with Krona/Pavian. -->
 
 ---
 
@@ -611,6 +701,20 @@ GENE_B      2      0       3       1
 - Prokka / Bakta = general bacterial (more "hypothetical protein")
 
 <!-- Phage genes sparse in generic DBs → use the phage-specialized tool. -->
+
+---
+
+<p class="eyebrow">MODULE 3c · PATHOGEN CHARACTERIZATION</p>
+
+## When it's a pathogen: AMR / virulence / typing
+
+- **ABRicate** — screen contigs for AMR + virulence genes
+- **MLST** — sequence type for outbreak tracking · **bcftools consensus / medaka** — consensus genome
+- **FastTree** — phylogeny to compare isolates
+
+> This is the Module-0 *Salmonella* example: serotype + 7-gene MLST + AMR, end to end.
+
+<!-- Shifts the annotation question from "what gene" to "is it resistant, virulent, which strain." The GTN foodborne Nanopore tutorial walks the whole arc. Ties the metagenomics module back to the opening ONT colony-to-serotype story. -->
 
 ---
 
@@ -626,17 +730,17 @@ GENE_B      2      0       3       1
 
 - Numbers → **defensible biological claims**; visualize **before** you believe
 
-<!-- Pipeline exiting 0 means it ran, not that it's right. GUI alternative (GTN): JBrowse2 genome visualisation → topics/visualisation/tutorials/jbrowse2/tutorial.html -->
+<!-- Pipeline exiting 0 means it ran, not that it's right. GUI alternative (GTN): JBrowse2 genome visualisation, Circos (SV/CNV/comparative), IGV introduction → topics/visualisation/ and topics/introduction/tutorials/igv-introduction/ -->
 
 ---
 
 ## Visualization & stats per domain
 
-- **IGV** (variants — strand / end / homopolymer artifacts)
-- **Volcano / MA / PCA** (RNA-seq) · **genome maps / Krona** (phage)
+- **IGV** / **JBrowse2** (variants — strand / end / homopolymer artifacts; JBrowse2 = shareable)
+- **Volcano / MA / PCA** (RNA-seq) · **genome maps / Krona** (phage) · **Circos** (SV / CNV / comparative)
 - Effect size + significance; multiple testing everywhere; differential ≠ functional
 
-<!-- The IGV strand-bias story and the PCA-clusters-by-date (= batch effect) story. -->
+<!-- The IGV strand-bias story and the PCA-clusters-by-date (= batch effect) story. JBrowse2 embeds in a report/shared workflow; Circos is the circular multi-track view for structural/comparative genomics — powerful but fiddly. -->
 
 ---
 
@@ -675,7 +779,7 @@ GENE_B      2      0       3       1
 
 > Everything you did by hand, **nf-core runs for you** — now you can trust / configure / debug it.
 
-<!-- THE punchline. They understand each stage now, so the pipelines aren't black boxes. GUI alternative (GTN): Galaxy is itself a GUI workflow manager with provenance by default — Creating/editing workflows + the history system → topics/galaxy-interface/ -->
+<!-- THE punchline. They understand each stage now, so the pipelines aren't black boxes. GUI alternative (GTN): Galaxy is itself a GUI workflow manager with provenance by default — Creating/editing workflows, the history system, Workflow Reports (shareable run reports), and reproducing a published analysis → topics/galaxy-interface/ and topics/introduction/tutorials/galaxy-reproduce/ -->
 
 ---
 
