@@ -97,6 +97,121 @@ Design → QC → Preprocess → Core (ALIGN / ASSEMBLE) → Downstream → Inte
 
 ---
 
+<!-- _class: skeleton -->
+
+<p class="eyebrow">MODULE 0 · SHORT-READ SPOTLIGHT</p>
+
+## Illumina: the high-accuracy workhorse
+
+- Fragment → ligate P5/P7 adapters + index → bridge-amplify → **SBS** → FASTQ
+- Highest accuracy (Q30+), highest throughput, cheapest per base; paired-end
+- Short-read limit: cannot span long repeats or large structural variants
+
+<!-- The short-read workhorse. Walk the four-step loop: library prep → cluster amplification → SBS imaging → FASTQ. Sell the strengths, then be honest about the limit: short reads can't span repeats, which is exactly why this branch uses BWA/Bowtie2 + SPAdes/MEGAHIT. -->
+
+---
+
+<p class="eyebrow">MODULE 0 · SBS WORKFLOW</p>
+
+## Illumina SBS: step by step
+
+- **(A)** Library prep — fragment gDNA + ligate P5/P7 adapters + sample index onto both ends
+- **(B)** Cluster amplification — bridge-amplify each fragment into a clonal cluster on the flow cell
+- **(C)** Sequencing-by-synthesis — add one fluorescent reversible-terminator per cycle → image → cleave → repeat
+- **(D)** Alignment & analysis — align reads to reference → call variants / counts
+
+<!-- The real SBS methodology in the order it runs. Emphasize that the index enables multiplexing. The cluster step is why signal is detectable — one molecule is invisible; a clonal cluster is not. -->
+
+---
+
+<p class="eyebrow">MODULE 0 · SBS — STEP A IN DETAIL</p>
+
+## Library prep: adapters on every fragment
+
+```
+1  Fragment (shear gDNA to target insert size)
+2  Ligate P5 / P7 adapters + sample index onto both ends  (A·T overhang)
+3  Sequencing-ready library:
+      flow-cell handle  |  amplification primer  |  index  |  sequencing primer
+```
+
+- Every fragment gets **both adapters** — the index inside enables multiplexing
+- Many samples → one run → demultiplex by barcode after sequencing
+
+<!-- A zoom on step (A). The adapters are the handles that allow the fragment to do everything else. The index is what makes multiplexing possible. -->
+
+---
+
+<p class="eyebrow">MODULE 0 · ILLUMINA ARRAY GENOTYPING</p>
+
+## Illumina genotyping array: a different workflow
+
+- **BeadArray SNP genotyping — not SBS**
+- (1) 200–400 ng gDNA → (2) PCR-free whole-genome amplification → (3) fragment
+- (4) Hybridize to 50-mer locus-specific probe → single-base extension with fluorescent dNTP → genotype by color
+
+> No flow cell, no cluster amplification, no quality string — you get a genotype call per probe.
+
+<!-- Flag this explicitly: the Infinium array is a completely different Illumina platform. Students often conflate the two. -->
+
+---
+
+<!-- _class: skeleton -->
+
+<p class="eyebrow">MODULE 0 · LONG-READ SPOTLIGHT</p>
+
+## PacBio HiFi: long AND accurate
+
+- Polymerase in a **ZMW** reads a circular **SMRTbell** template repeatedly → **CCS** → HiFi read
+- Long (~10–25 kb) **and** accurate (Q30+) — circular consensus cancels per-pass error
+- Gold standard for de novo assembly, phasing, and full-length amplicons
+
+<!-- The accurate long-read platform. ZMW = zero-mode waveguide. SMRTbell = hairpin-capped circular template. Many passes → CCS → Q30+. Trade-off: more expensive and lower throughput than Illumina; pairs with minimap2 + hifiasm/Flye. -->
+
+---
+
+<p class="eyebrow">MODULE 0 · HIFI IN PRACTICE</p>
+
+## PacBio HiFi in practice: full-length 16S profiling
+
+- Amplify V1–V9 (~1,500 bp) with **dual-barcoded primers** → pool → SMRTbell library → HiFi sequence
+- HiFi reads the **entire amplicon** → species/strain-level taxonomy (short V3–V4 cannot)
+- Dual-index plate layout → up to **192 samples** per run
+
+> Short reads top out at genus. HiFi resolves to species or strain.
+
+<!-- The key insight: full-length amplicons + HiFi accuracy = the species/strain resolution that short-read V3-V4 fragments simply cannot achieve. -->
+
+---
+
+<!-- _class: skeleton -->
+
+<p class="eyebrow">MODULE 0 · LONG-READ SPOTLIGHT</p>
+
+## MinION: nanopore sequencing in your palm
+
+- DNA through a protein nanopore → **ionic-current squiggle** → basecaller (Dorado) → FASTQ
+- **Real-time & portable** — USB-powered, palm-sized; reads stream as they sequence
+- **Ultra-long reads** (>100 kb possible); trade-off: indel-heavy error profile → minimap2 + Flye
+
+<!-- Sell the three superpowers: real-time, portable, ultra-long. Be honest about the trade-off: higher per-base error (especially indels in homopolymers), mitigated by modern basecallers and depth. This is exactly why the ONT branch uses minimap2 (not BWA) and Flye (not SPAdes). -->
+
+---
+
+<p class="eyebrow">MODULE 0 · ONT IN PRACTICE</p>
+
+## MinION in practice: Salmonella colony → serotype same day
+
+- **Direct-from-colony**: pick colony → Rapid PCR Barcoding Kit (SQK-RPB114.24) → 24 barcoded samples → R10.4.1 flow cell
+- MinKNOW real-time HAC basecalling → EPI2ME `wf-bacterial-genomes` → Flye assembly + Medaka polish
+- Output: species ID + serotype + 7-gene MLST + AMR profile — **no DNA extraction required**
+
+> This is the ASSEMBLE branch in action — the genome is reconstructed de novo.
+
+<!-- Threads every ONT concept together: direct-from-colony = skip extraction; real-time basecalling; EPI2ME workflow = nf-core equivalent for ONT. Output is assembly-based, not alignment-based. -->
+
+---
+
 ## Experimental design
 
 - **Replicates** (biological ≫ technical), **controls**, depth / coverage

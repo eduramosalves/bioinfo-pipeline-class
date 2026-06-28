@@ -75,6 +75,103 @@ a detail — it is the first fork in the road.
 
 ---
 
+## 2.1 Platform spotlight — Illumina (SBS)
+
+Illumina is the **short-read workhorse**. The chemistry is called *sequencing-by-synthesis* (SBS):
+
+1. **Library preparation** — genomic DNA is fragmented (sheared) to a target insert size. Specialized
+   P5/P7 adapters — including a per-sample index — are ligated to **both ends** of every fragment.
+   Those adapters are the handles: they let the fragment hybridize to the flow cell surface and prime
+   both cluster amplification and sequencing. A sample index inside the adapter lets many samples
+   share one run (multiplexing).
+
+2. **Cluster amplification** — each adapter-ligated fragment hybridizes to the flow cell and is
+   *bridge-amplified* into a clonal cluster (~1,000 copies of the same molecule). Clonal clusters
+   make the signal detectable by the camera.
+
+3. **Sequencing** — fluorescently labeled, reversible-terminator nucleotides are added one cycle at a
+   time. After each incorporation, the flow cell is imaged; emission color and intensity call the
+   base. The terminator is then cleaved and the cycle repeats *n* times to produce an *n*-base read.
+
+4. **Data output** — FASTQ files with per-base Phred quality scores.
+
+**Strengths:** highest accuracy (Q30+), highest throughput, lowest cost per base, paired-end reads.  
+**Limits:** short reads (50–300 bp) cannot span long repetitive regions or resolve large structural
+variants — which is exactly why the Illumina branch uses BWA/Bowtie2 for alignment and SPAdes/MEGAHIT
+for assembly.
+
+> **Note — genotyping arrays are not SBS.** The Illumina Infinium BeadArray workflow (used for SNP
+> genotyping chips) is entirely different: DNA is amplified (PCR-free whole-genome amplification),
+> fragmented, then hybridized to 50-mer locus-specific probes on a bead array. A single-base
+> extension step adds a fluorescent nucleotide complementary to the SNP allele, and the color reads
+> the genotype. No flow cell, no cluster amplification, no per-base quality string — you get a
+> genotype call per probe, not sequence reads.
+
+---
+
+## 2.2 Platform spotlight — PacBio HiFi
+
+PacBio HiFi delivers reads that are **both long (~10–25 kb) and highly accurate (Q30+)** — a
+combination no other platform currently matches.
+
+**Mechanism:** a single DNA polymerase is immobilized at the bottom of a *zero-mode waveguide* (ZMW)
+— a nanoscale well that illuminates only the attoliter volume around the enzyme. The template is
+prepared as a *SMRTbell* — the insert DNA flanked by hairpin adapters, forming a closed circle. The
+polymerase reads the same circular molecule **repeatedly**; individual passes are error-prone, but
+*circular consensus sequencing* (CCS) averages many passes to cancel random errors, yielding a HiFi
+read with Q30+ accuracy.
+
+**In practice — full-length 16S rRNA profiling:**  
+The whole 16S gene (V1–V9, ~1,500 bp) is amplified with dual-barcoded primers (a forward index
+across plate rows × a reverse index down columns → up to 192 samples per run). After a gel spot-check
+for the ~1.5 kb band, amplicons are pooled equally, made into a SMRTbell library, and sequenced.
+Because HiFi reads the **entire amplicon**, taxonomy can resolve to species or strain — something
+short V3–V4 fragments cannot do.
+
+| | **Illumina** | **PacBio HiFi** |
+|---|---|---|
+| Read length | 50–300 bp | 10–25 kb |
+| Accuracy | Q30+ | Q30+ (CCS) |
+| Throughput | very high | lower |
+| Best for | SNVs, deep counts | de novo assembly, phasing, full-length amplicons |
+| Aligner | BWA-MEM, Bowtie2 | **minimap2** |
+| Assembler | SPAdes / MEGAHIT | **hifiasm** / Flye |
+
+---
+
+## 2.3 Platform spotlight — Oxford Nanopore MinION
+
+MinION is the **portable, real-time long-read** sequencer from Oxford Nanopore Technologies (ONT).
+
+**Mechanism:** DNA (or RNA) threads through a protein **nanopore** embedded in a synthetic membrane.
+As each base transits the pore, it perturbs an ionic current. A basecaller (Dorado) converts the
+raw current signal ("squiggle") into nucleotide letters, emitting FASTQ/BAM in real time.
+
+**Three superpowers:**
+- **Real-time** — reads stream off the device as they are sequenced; you can stop a run when you
+  have enough depth.
+- **Portable** — USB-powered, palm-sized; deployable in the field or in a clinical setting.
+- **Ultra-long reads** — routinely >100 kb, up to megabases, enabling chromosome-spanning assemblies
+  and structural variant resolution.
+
+**Trade-off:** higher per-base error rate than Illumina, especially indels in homopolymers.
+Modern basecallers (Dorado High-Accuracy / Super-Accuracy mode) have substantially narrowed the gap,
+and sufficient depth compensates further. This error profile is why the ONT branch uses **minimap2**
+(not BWA) and **Flye** (not SPAdes).
+
+**In practice — Salmonella colony-to-serotype:**  
+Oxford Nanopore's Rapid PCR Barcoding Kit (SQK-RPB114.24) enables direct-from-colony sequencing:
+pick a colony → resuspend → tagment with Fragmentation Mix → PCR with one of 24 barcoded primers →
+pool → AMPure clean-up → attach rapid adapter → load R10.4.1 flow cell. MinKNOW runs sequencing with
+real-time HAC basecalling, emitting POD5/FASTQ/BAM. Downstream, EPI2ME's `wf-bacterial-genomes`
+assembles with Flye and polishes with Medaka (Isolates mode), returning species ID, serotype, 7-gene
+MLST, and an AMR profile — all from a single colony, same day.
+
+This end-to-end example is the **ASSEMBLE branch** in action: no reference alignment needed, because
+the genome is reconstructed de novo from the long reads.
+
+---
+
 ## 3. Experimental design
 
 Bioinformatics cannot rescue a broken experiment. The design decisions that matter most:

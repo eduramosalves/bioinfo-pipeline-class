@@ -45,7 +45,7 @@ No prior pipeline experience is assumed.
 
 | Module | File | Topic | Lecture |
 |--------|------|-------|---------|
-| 0 | `notes/00-foundations.md` | Pipelines, platforms, experimental design, file formats | ~40 min |
+| 0 | `notes/00-foundations.md` | Pipelines, platforms (Illumina SBS, PacBio HiFi, MinION), experimental design, file formats | ~60 min |
 | 1 | `notes/01-qc-preprocessing.md` | FastQC/MultiQC, trimming & filtering | ~30 min |
 | 2 | `notes/02-core-processing.md` | Alignment vs assembly — **the branch point** | ~40 min |
 | 3a | `notes/03-domain-variant-calling.md` | GATK → VCF → annotation → ACMG | ~40 min |
@@ -54,7 +54,7 @@ No prior pipeline experience is assumed.
 | 4 | `notes/04-interpretation-reporting.md` | Visualization, stats, reporting | ~25 min |
 | 5 | `notes/05-reproducibility.md` | nf-core/Snakemake, conda, containers | ~30 min |
 
-**Total**: ~3–4 h of lecture + ~2 h hands-on lab. Modules 3a/3b/3c are parallel — deliver all
+**Total**: ~4–5 h of lecture + ~2 h hands-on lab. Modules 3a/3b/3c are parallel — deliver all
 three for a survey course, or pick the one matching your audience for a focused session.
 
 ## Repository layout
