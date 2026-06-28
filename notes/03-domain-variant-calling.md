@@ -70,7 +70,9 @@ VCF
 | Caller | Reach for it when |
 |--------|-------------------|
 | **bcftools** (`mpileup` + `call`) | fast, lightweight, great for bacterial/viral genomes, simple germline; the hands-on lab uses it |
+| **Snippy** | **bacterial** isolates — an align+call+annotate pipeline (BWA-MEM → FreeBayes → effects) in one command; the de-facto standard for microbial SNP calling and the GTN bacterial labs' choice |
 | **GATK HaplotypeCaller** | human germline gold standard, large cohorts, clinical pipelines |
+| **FreeBayes** | haplotype-based Bayesian caller; no BQSR needed, handles pooled/non-diploid samples and odd ploidy well; common for non-human and as Snippy's engine |
 | **DeepVariant** | deep-learning caller; state-of-the-art accuracy, strong on PacBio HiFi/ONT, less parameter fiddling |
 | **Mutect2** (GATK) | **somatic** calling (tumor/normal), low-AF variants |
 
@@ -105,6 +107,12 @@ high genotype quality, passed filters."* (This locus is in *CFTR* — see ACMG b
 
 A raw VCF says *where* a variant is, not *what it does*. Annotation tools intersect variants with
 gene models and databases to predict **functional consequence**:
+
+> **Normalize first.** Before annotating or comparing VCFs, run `bcftools norm` to **left-align**
+> indels and **split multi-allelic** sites (`-m -`) against the reference. The same indel can be
+> written several equivalent ways; un-normalized, it won't match ClinVar/gnomAD or another caller's
+> VCF and the annotation silently misses. This is a standard step in the GTN exome/somatic labs.
+> `bcftools norm -f reference.fasta -m - sample.vcf.gz -Oz -o sample.norm.vcf.gz`
 
 | Tool | Notes |
 |------|-------|
@@ -207,6 +215,7 @@ bcftools stats sample.filt.vcf.gz | grep "number of SNPs:"
 ## ↗ Try it in Galaxy (GUI alternative)
 
 The variant-calling arc, in a browser via the **Galaxy Training Network**:
-- [Microbial Variant Calling](https://training.galaxyproject.org/training-material/topics/variant-analysis/tutorials/microbial-variants/tutorial.html) — bacterial calling, closest to this module's `bcftools` *E. coli* lab.
+- [Microbial Variant Calling](https://training.galaxyproject.org/training-material/topics/variant-analysis/tutorials/microbial-variants/tutorial.html) — bacterial calling (Snippy), closest to this module's `bcftools` *E. coli* lab.
+- [M. tuberculosis Variant Analysis](https://training.galaxyproject.org/training-material/topics/variant-analysis/tutorials/tb-variant-analysis/tutorial.html) — bacterial calling extended to **drug-resistance / AMR profiling** (TB-Profiler) and MLST typing.
 - [Exome sequencing for diagnosing a genetic disease](https://training.galaxyproject.org/training-material/topics/variant-analysis/tutorials/exome-seq/tutorial.html) — germline/clinical (the ACMG end of this module).
 - [Somatic & germline variants from tumor/normal pairs](https://training.galaxyproject.org/training-material/topics/variant-analysis/tutorials/somatic-variants/tutorial.html) — the Mutect2 case.

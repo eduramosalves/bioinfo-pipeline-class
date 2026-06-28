@@ -148,3 +148,5 @@ Galaxy is itself a reproducibility platform — a **GUI workflow manager** along
 Nextflow/Snakemake CLI tools here, with provenance captured by default. Via the **Galaxy Training Network**:
 - [Creating, Editing and Importing Galaxy Workflows](https://training.galaxyproject.org/training-material/topics/galaxy-interface/tutorials/workflow-editor/tutorial.html) — declare a pipeline visually.
 - [Understanding the Galaxy history system](https://training.galaxyproject.org/training-material/topics/galaxy-interface/tutorials/history/tutorial.html) — every step, tool, and parameter recorded automatically.
+- [Workflow Reports](https://training.galaxyproject.org/training-material/topics/galaxy-interface/tutorials/workflow-reports/tutorial.html) — automated, shareable run reports (the provenance trail of §5, generated for you — like nf-core's `pipeline_info/`).
+- [How to reproduce published Galaxy analyses](https://training.galaxyproject.org/training-material/topics/introduction/tutorials/galaxy-reproduce/tutorial.html) — re-run someone else's analysis from a shared history/workflow, the reproducibility test in practice.

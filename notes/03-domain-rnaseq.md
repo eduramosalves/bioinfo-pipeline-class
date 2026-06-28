@@ -40,7 +40,8 @@ Align reads to the **genome** with a splice-aware aligner, then count reads per 
 | **HISAT2** | memory-efficient splice-aware aligner; graph-based |
 Counting from the BAM: **featureCounts** (subread) or **HTSeq-count**, using a **GTF** gene model.
 Use this route when you need the alignments themselves (novel transcripts, variants in RNA, splice
-analysis).
+analysis) — including **differential *exon* usage** (DEXSeq), which asks whether isoform/exon
+proportions shift, a question gene-level counts can't answer.
 
 ### Route B — pseudo-alignment (alignment-free)
 Skip base-level alignment: assign reads to **transcripts** by k-mer compatibility, directly
@@ -55,6 +56,12 @@ expression. It's dramatically faster and needs less memory.
 
 > **Rule of thumb:** want counts for DE and nothing exotic? **Salmon/kallisto.** Need the
 > alignments (splicing, RNA variants, novel isoforms)? **STAR/HISAT2 + featureCounts.**
+
+> **Check strandedness before you count — the silent count-killer.** Library preps are unstranded,
+> forward (FR), or reverse (RF), and `featureCounts`/HTSeq must be told which (`-s 0/1/2`). Get it
+> wrong and counts come back near-**zero** for every gene with no error — the run "succeeds." Infer
+> it from the data first (RSeQC **Infer Experiment**, or Salmon's auto-detect) and set the counter to
+> match. Pseudo-aligners detect strandedness automatically, which is one less way to shoot yourself.
 
 ---
 
@@ -95,8 +102,11 @@ Normalization metrics and what they fix:
 
 ## 5. Differential expression with DESeq2 / edgeR
 
-Both model counts with a **negative binomial** distribution (counts are over-dispersed — variance >
-mean — so Poisson is insufficient). The workflow:
+**DESeq2** and **edgeR** both model counts with a **negative binomial** distribution (counts are
+over-dispersed — variance > mean — so Poisson is insufficient). A third common engine, **limma-voom**
+(the GTN default), takes a different route: it transforms counts to log-CPM with precision *weights*
+and reuses limma's mature linear-model machinery — fast, robust, and excellent with many samples.
+Any of the three is defensible; pick one and report it. The workflow:
 
 1. **Input raw counts** + a sample/condition design.
 2. **Estimate size factors** (normalization) and **dispersion** (gene-wise variability, shrunk
@@ -141,6 +151,24 @@ checks for normalization artifacts.
 
 ---
 
+## 7. What's next — from a gene list to biology
+
+A DE table is a *means*, not the end. The standard downstream is **functional enrichment**: which
+*pathways or processes* are over-represented among the changed genes?
+
+- **Over-representation (ORA)** — take your significant list and test which **GO terms** or **KEGG
+  pathways** are enriched vs background. **goseq** is the RNA-seq-aware choice (it corrects for the
+  length bias that makes long genes more likely to reach significance).
+- **Gene Set Enrichment Analysis (GSEA)** — *don't* threshold; rank *all* genes by fold-change and
+  ask whether a gene set sits non-randomly toward the top/bottom (**fgsea**, EGSEA). More powerful
+  when many genes shift subtly in the same direction.
+- Visualize on the pathway itself with **Pathview** (KEGG maps colored by fold-change).
+
+> **The enrichment trap:** use the **right background** (all *expressed* genes, not the whole
+> genome) and correct length bias — otherwise GO terms full of long genes light up as fake hits.
+
+---
+
 ## Checkpoint
 1. A colleague normalizes counts to **TPM** and runs DESeq2 on the TPM values. What's wrong, and
    what should they feed in instead?
@@ -171,5 +199,6 @@ checks for normalization artifacts.
 The reads → counts → differential-expression arc, in a browser via the **Galaxy Training Network**:
 - [Reference-based RNA-Seq data analysis](https://training.galaxyproject.org/training-material/topics/transcriptomics/tutorials/ref-based/tutorial.html) — spliced alignment → counts → DE end-to-end.
 - [RNA-Seq reads to counts](https://training.galaxyproject.org/training-material/topics/transcriptomics/tutorials/rna-seq-reads-to-counts/tutorial.html) then [counts to genes](https://training.galaxyproject.org/training-material/topics/transcriptomics/tutorials/rna-seq-counts-to-genes/tutorial.html) — the count-matrix → DE step in detail.
+- [Genes to pathways](https://training.galaxyproject.org/training-material/topics/transcriptomics/tutorials/rna-seq-genes-to-pathways/tutorial.html) — the functional-enrichment step in §7 (goseq / fgsea / EGSEA), and [RNA-Seq Volcano Plot](https://training.galaxyproject.org/training-material/topics/transcriptomics/tutorials/rna-seq-viz-with-volcanoplot/tutorial.html).
 
 *(GTN leans HISAT2/featureCounts + limma-voom/DESeq2; there is no standalone Salmon tutorial, but the normalization and FDR concepts here apply unchanged.)*

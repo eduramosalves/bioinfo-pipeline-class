@@ -1,0 +1,787 @@
+---
+layout: tutorial_hands_on
+title: Assembly of metagenomic sequencing data
+zenodo_link: https://zenodo.org/record/7818827
+level: Introductory
+questions:
+- Why metagenomic data should be assembled?
+- What is the difference between co-assembly and individual assembly?
+- What is the difference between reads, contigs and scaffolds?
+- How tools based on De Bruijn graph work?
+- How to assess the quality of metagenomic data assembly?
+objectives:
+- Describe what an assembly is.
+- Explain the difference between co-assembly and individual assembly.
+- Explain the difference between reads, contigs and scaffolds.
+- Explain how tools based on de Bruijn graph work.
+- Evaluate the quality of the Assembly with QUAST, Bowtie2, and CoverM-Contig.
+- Construct and apply simple assembly pipelines on short read data.
+time_estimation: 2H
+key_points:
+- Assembly groups reads into contigs and scaffolds.
+- de Brujin Graphs use k-mers to assembly reads.
+- MetaSPAdes and MEGAHIT are short-read assemblers.
+- MetaQUAST is a tool to assess metagenomic assembly quality.
+edam_ontology:
+- topic_3174
+- topic_0196
+contributions:
+  authorship:
+  - plushz
+  - bebatut
+  - vinisalazar
+  - paulzierep
+  funding:
+  - gallantries
+subtopic: metagenomics
+tags:
+- assembly
+- metagenomics
+- microgalaxy
+redirect_from:
+- "/topics/metagenomics/tutorials/metagenomics-assembly/tutorial"
+recordings:
+- youtube_id: 1ZYGy85Im7w
+  date: '2023-05-02'
+  speakers:
+  - bebatut
+  galaxy_version: '23.01'
+  length: 1H
+  captioners:
+  - bebatut
+  - sophia120199
+- youtube_id: KzqLR4btsic
+  length: 1H15M
+  galaxy_version: 25.1.2.dev0
+  date: '2026-03-26'
+  speakers:
+    - gdefazio
+  captioners:
+    - gdefazio
+    - natalie-wa
+
+---
+
+
+Metagenomics involves the extraction, sequencing and analysis of combined genomic DNA from **entire microbiome** samples. It includes then DNA from **many different organisms**, with different taxonomic background.
+
+Reconstructing the genomes of microorganisms in the sampled communities is critical step in analyzing metagenomic data. To do that, we can use **assembly** and assemblers, *i.e.* computational programs that stich together the small fragments of sequenced DNA produced by sequencing instruments.
+
+Assembling seems intuitively similar to putting together a jigsaw puzzle. Essentially, it looks for reads "that work together" or more precisely, reads that overlap. Tasks like this are **not straightforward**, but rather complex because of the complexity of the genomics (specially the repeats), the missing pieces and the errors introduced during sequencing.
+
+> <comment-title></comment-title>
+>
+> Do you want to learn more about the principles behind single genome assembly? Follow our [tutorials]({% link topics/assembly/index.md %}).
+{: .comment}
+
+**Metagenomic assembly** is further complicated by
+- the large volume of data produced
+- the quality of the sequence
+- the unequal representation of members of the microbial community
+- the presence of closely related microorganisms with similar genomes
+- the presence of several strains of the same microorganism
+- an insufficient amount of data for minor community members
+
+> <details-title>Strategies for assembly</details-title>
+> For assembly, there are 3 main strategies:
+> 1. Greedy extension
+> 2. Overlap Layout Consensus
+> 3. De Bruijn graphs. The following figure illustrates these strategies in brief.
+>
+> ![Image shows greedy extention, overlap layout consensus, and de Brujin graphs assembly algorithms.](./images/assembly-algorithms.png "Assembly algorithms. Image from {% cite carpentries %}."){:width="70%"}
+>
+> The nice paper {% cite miller2010 %} on assemblers based on these algorithms will help you to better understand how they work.
+{: .details}
+
+For metagenomic assembly, several tools exist: metaSPAdes ({% cite nurk2017 %}), MEGAHIT ({% cite li2015 %}), etc. The different assemblers have different computational characteristics and their performance varies according to the microbiome as shown in by both rounds of  Critical Assessment of Metagenome Interpretation initiative ({% cite sczyrba2017 %}, {% cite meyer2022 %}, {% cite meyer2021 %}). The preference of one assembler over another depends on the purpose at hand.
+
+In this tutorial, we will learn how to run metagenomic assembly tool and evaluate the quality of the generated assemblies. To do that, we will use data from the study: [Temporal shotgun metagenomic dissection of the coffee fermentation ecosystem](https://www.ebi.ac.uk/metagenomics/studies/MGYS00005630#overview). For an in-depth analysis of the structure and functions of the coffee microbiome, a temporal shotgun metagenomic study (six time points) was performed. The six samples have been sequenced with Illumina MiSeq utilizing whole genome sequencing.
+
+Based on the 6 original dataset of the coffee fermentation system, we generated mock datasets for this tutorial.
+
+> <agenda-title></agenda-title>
+>
+> In this tutorial, we will cover:
+>
+> 1. TOC
+> {:toc}
+>
+{: .agenda}
+
+# Prepare analysis history and data
+
+To run assembly, we first need to get the data into Galaxy. Any analysis should get its own Galaxy history. So let's start by creating a new one:
+
+> <hands-on-title>Prepare the Galaxy history</hands-on-title>
+>
+> 1. Create a new history for this analysis
+>
+>    {% snippet faqs/galaxy/histories_create_new.md %}
+>
+> 2. Rename the history
+>
+>    {% snippet faqs/galaxy/histories_rename.md %}
+>
+{: .hands_on}
+
+We need to get the data into our history.
+
+In case of a not very large dataset it's more convenient to upload data directly from your computer to Galaxy.
+
+> <hands-on-title>Upload data into Galaxy</hands-on-title>
+>
+> 1. Import the sequence read raw data (\*.fastqsanger.gz) from [Zenodo]({{ page.zenodo_link }}) or a data library:
+>
+>    ```text
+>    {{ page.zenodo_link }}/files/ERR2231567_1.fastqsanger.gz
+>    {{ page.zenodo_link }}/files/ERR2231567_2.fastqsanger.gz
+>    {{ page.zenodo_link }}/files/ERR2231568_1.fastqsanger.gz
+>    {{ page.zenodo_link }}/files/ERR2231568_2.fastqsanger.gz
+>    {{ page.zenodo_link }}/files/ERR2231569_1.fastqsanger.gz
+>    {{ page.zenodo_link }}/files/ERR2231569_2.fastqsanger.gz
+>    {{ page.zenodo_link }}/files/ERR2231570_1.fastqsanger.gz
+>    {{ page.zenodo_link }}/files/ERR2231570_2.fastqsanger.gz
+>    {{ page.zenodo_link }}/files/ERR2231571_1.fastqsanger.gz
+>    {{ page.zenodo_link }}/files/ERR2231571_2.fastqsanger.gz
+>    {{ page.zenodo_link }}/files/ERR2231572_1.fastqsanger.gz
+>    {{ page.zenodo_link }}/files/ERR2231572_2.fastqsanger.gz
+>    ```
+>
+>    {% snippet faqs/galaxy/datasets_import_via_link.md %}
+>
+>    {% snippet faqs/galaxy/datasets_import_from_data_library.md %}
+>
+>    > <comment-title></comment-title>
+>    > In case of large dataset, we can use FTP server or the [Galaxy Rule-based Uploader]({% link topics/galaxy-interface/tutorials/upload-rules/tutorial.md %}).
+>    {: .comment}
+>
+> 2. Create a paired collection named `Raw reads`, rename your pairs with the sample name
+>
+>    {% snippet faqs/galaxy/collections_build_list_paired.md %}
+>
+{: .hands_on}
+
+# Assembly
+
+As explained before, there are many challenges to metagenomics assembly, including:
+
+1. Differences in coverage between samples, resulting from differences in abundance;
+2. The fact that different species often share conserved regions ({%cite kececioglu2001%}), and
+3. The presence of multiple strains of a single species ({%cite miller2010%}).
+
+To reduce the differences in coverage between samples, we can use a **co-assembly** approach, where reads from all samples are aligned together:
+
+![Image show one pile of sample1 reads and another pile of sample2 reads, then, green arrow leads to assembled reads from both piles](./images/co-assembly.png "Co-assembly"){:width="60%"}
+
+Pros of co-assembly | Cons of co-assembly
+--- | ---
+More data | Higher computational overhead
+Better/longer assemblies | Risk of shattering your assembly
+Access to lower abundant organisms | Risk of increased contamination
+
+Co-assembly is then not always beneficial:
+- Changes in strain can cause the assembly graph to collapse
+- Binned contigs are likely to be misclassified: MAGs must be treated as a population genome.
+
+![Image shows the process of assembled reads from 2 samples followed by binning and there is detailed information about broken contigs, dominant coverage, chimeric contigs found during assembly process](./images/co-assembly-process.png "Co-assembly process"){:width="80%"}
+
+In these cases, co-assembly is reasonable if:
+- Same samples
+- Same sampling event
+- Longitudinal sampling of the same site
+- Related samples
+
+{% snippet faqs/galaxy/fastq_groupmerge.md %}
+
+Examples where co-assembly would be reasonable:
+- Repeated sampling of the **same patient** along a particular amount of time.
+- Multiple samples taken from the **same site** and **similar environmental conditions**, eg. a patch of soil during the same sampling season.
+
+Examples where co-assembly would NOT be recommended:
+- Samples from different patients.
+If samples differ as described, **individual assembly** is preferred. In the case of individual assembly, **contigs should be binned** per sample and an extra step of **de-replication** should be used as binning:
+
+If samples differ as described, **individual assembly** is preferred. In the case of individual assembly, **contigs should be binned** per sample and an extra step of **de-replication** should be used after binning:
+
+
+> <comment-title></comment-title>
+> For more information on dereplication, check out the [metagenomic binning tutorial]({% link topics/microbiome/tutorials/metagenomics-binning/tutorial.md %}).
+{: .comment}
+
+In this tutorial, to show all steps, we will run an **individual assembly**.
+
+> <comment-title>Why not both?</comment-title>
+> It is also possible to run both individual assembly and co-assembly, and this approach can recover MAGs effectively. In this case: individual assembly can recover MAGs with a low amount of contamination, while co-assembly also allows for the recovery of low-abundance MAGs, with the downside of potentially more contamination. Although this approach can be effective, it also requires high computational resources and should be considered carefully.
+>
+> {% snippet faqs/galaxy/fastq_groupmerge.md %}
+>
+{: .comment}
+
+As mentioned in the introduction, several tools are available for metagenomic assembly. But 2 are the most used ones:
+
+- **MetaSPAdes** ({%cite nurk2017%}): an short-read assembler designed specifically for large and complex metagenomics datasets.
+
+  MetaSPAdes is part of the SPAdes toolkit, which has several assembly pipelines. Since SPAdes handles non-uniform coverage, it is useful for assembling simple communities, but metaSPAdes also handles other problems, allowing it to assemble complex communities' metagenomes.
+
+  As input for metaSPAdes it can accept short reads. However, there is an option to use additionally long reads besides short reads to produce hybrid input.
+
+- **MEGAHIT** ({% cite li2015 %}): a single node assembler for large and complex metagenomics NGS reads, such as soil
+
+  It makes use of the Succinct de Bruijn Graph (SdBG) approach to achieve low memory assembly.
+
+Both tools are available in Galaxy. But currently, only **MEGAHIT** can be used in individual mode for several samples, as a option in the wrapper.
+**MetaSPAdes** performs co-assembly by default if multiple samples are supplied. However, individually assembly can be enforced:
+
+{% snippet faqs/galaxy/collections_force_mapping_over.md %}
+
+# Assembly with MEGAHIT
+
+> <hands-on-title>Individual assembly of short-reads with MEGAHIT</hands-on-title>
+> 1.  {% tool [MEGAHIT](toolshed.g2.bx.psu.edu/repos/iuc/megahit/megahit/1.2.9+galaxy2) %} with parameters:
+>     - *"Select your input option"*: `Paired-end collection`
+>       - *"Run in batch mode?"*: `Run individually`
+>
+>          > <comment-title></comment-title>
+>          > To run as co-assembly, select `Merge all fastq pair-end`, instead of `Run individually`
+>          {: .comment}
+>
+>       - {% icon param-collection %} *"Select a paired collection"*: `Raw reads`
+>     - In *Basic assembly options*
+>       - *"K-mer specification method"*: `Specify min, max, and step values`
+>         - *"Minimum kmer size"*: 21
+>         - *"Maximum kmer size"*: 91
+>         - *"Increment of kmer size of each iteration"*: 12
+>
+{: .hands_on}
+
+**MEGAHIT** produced a collection of output assemblies - one per sample - that can be used for the subsequent step of **metagenomic binning**. The output contains **contigs**, contiguous lengths of genomic sequences in which bases are known to a high degree of certainty.
+
+> <comment-title>Scaffolds</comment-title>
+> Contrary to **MetaSPAdes**, **MEGAHIT** does not output **scaffolds**. **Scaffolds** are segments of genome sequence reconstructed fron contigs and gaps. The gaps occur when reads from the two sequenced ends of at least one fragment overlap with other reads from two different contigs (as long as the arrangement is otherwise consistent with the contigs being adjacent). It is possible to estimate the number of bases between contigs based on fragment lengths.
+{: .comment}
+
+> <comment-title></comment-title>
+>
+> Since the assembly process would take ~1h we are just going to import the results of the assembly previously run.
+>
+> > <hands-on-title>Import generated assembly files</hands-on-title>
+> >
+> > 1. Import the six contig files from [Zenodo]({{ page.zenodo_link }}) or the Shared Data library:
+> >
+> >    ```text
+> >    {{ page.zenodo_link }}/files/contigs_ERR2231567.fasta
+> >    {{ page.zenodo_link }}/files/contigs_ERR2231568.fasta
+> >    {{ page.zenodo_link }}/files/contigs_ERR2231569.fasta
+> >    {{ page.zenodo_link }}/files/contigs_ERR2231570.fasta
+> >    {{ page.zenodo_link }}/files/contigs_ERR2231571.fasta
+> >    {{ page.zenodo_link }}/files/contigs_ERR2231572.fasta
+> >    ```
+> >
+> >
+> > 2. Create a collection named `MEGAHIT Contigs`, rename your pairs with the sample name
+> >
+> {: .hands_on}
+{: .comment}
+
+> <question-title>Contig metrics</question-title>
+>
+> 1. How many contigs have been assembled for sample ERR2231568 ?
+> 2. And how many have been assembled for ERR2231572?
+> 3. What is the minimum length of the contigs?
+>
+> > <solution-title></solution-title>
+> >
+> > 1. There are 228,719 sequences in the file so 228,719 contigs
+> > 2. 122,526 contigs
+> > 3. Sequences seems bigger than 200 bp (`len` attribute of the sequence information in Fasta files). It is the default value set up in MEGAHIT.
+> >
+> {: .solution}
+>
+{: .question}
+
+> <details-title>Co-assembly with MetaSPAdes</details-title>
+> MetaSPAdes supports co-assembly by passing a list of paired-end read files.
+>
+> > <hands-on-title>Assembly with MetaSPAdes</hands-on-title>
+> > 1. {% tool [MetaSPAdes](toolshed.g2.bx.psu.edu/repos/nml/metaspades/metaspades/4.2.0+galaxy0) %} with the following parameters:
+>     - *"Pair-end reads input format"*: `Paired-end: list of dataset pairs`
+> >      - {% icon param-collection %} *"FASTQ file(s): collection"*: `Raw reads`
+> >
+> >    > <comment-title>Tip</comment-title>
+> >    > To run **individual assembly** instead, follow the previous FAQ to create a **nested list of samples**.
+> >     {: .comment}
+> >
+> >   - *"Select k-mer detection option"*: `User specific`
+> >    - *"K-mer size values"*: `21,33,55,77`
+> {: .hands_on}
+{: .details}
+
+# Quality control of assembly
+
+Once assembly is done, it is important to check its quality.
+
+Assemblies can be evaluated with **metaQUAST** ({%cite mikheenko2016%}), the metagenomics mode of **QUAST** ({%cite gurevich2013%}).
+
+> <hands-on-title>Evaluation of assembly quality with metaQUAST</hands-on-title>
+>
+> 1. {% tool [QUAST](toolshed.g2.bx.psu.edu/repos/iuc/quast/quast/5.2.0+galaxy1) %} with parameters:
+>     - *"Assembly mode?"*: `Individual assembly (1 contig file per samples)`
+>       - *"Use customized names for the input files?"*: `No, use dataset names`
+>         - {% icon param-collection %} *"Contigs/scaffolds file"*: output **MEGAHIT**
+>       - *"Reads options"*: `Illumina paired-end reads in paired collection`
+>
+>       > <comment-title>Tip</comment-title>
+>       > To speed up the processing, you may choose `Disabled` here. In this case, raw reads will **not** be mapped back to the assembly to compute metrics such as read coverage.
+>       {: .comment}
+>
+>       - {% icon param-collection %} *"FASTQ/FASTA files"*: `Raw reads`
+>     - *"Type of assembly"*: `Metagenome`
+>     - *"Output files"*: `HTML report`, `PDF report`, `Tabular reports`, `Log file`, `Key metric summary (metagenome mode)`, `Krona charts (metagenome mode without reference genomes)`
+>
+> 2. Inspect the HTML reports:
+> ![Screenshot of QUAST HTML report](./images/quast_html_report.png)
+{: .hands_on}
+
+
+> <tip-title>Preview MetaQUAST results</tip-title>
+>
+> 1. Since the QUAST process takes some time, we also provide an example history here:
+>
+>    - [Galaxy EU](https://usegalaxy.eu/histories/view?id=11ac94870d0bb33aeff2ed936aab8446)
+>
+{: .tip}
+
+QUAST main output are HTML reports which aggregate different metrics.
+
+## Assembly statistics
+
+On the top of each report is a table with in rows statistics for contigs larger than 500 bp for the different sample assemblies (columns). Let's now look at the table and go from top to bottom:
+
+1. **Genome statistics**
+
+    - **Genome fraction (%)**: percentage of aligned bases in the reference genome
+
+      A base in the reference genome is counted as aligned if at least one contig has at least one alignment to this base.
+
+      We did not provide any reference genome, but QUAST tries to identify the genome content of the metagenome by aligning contigs to [SILVA](https://www.arb-silva.de/) 16S rRNA database. For each assembly, 50 reference genomes with top scores are chosen. The full reference genomes of the identified organisms are downloaded from NCBI to map the assemblies on them and compute the genome fractions.
+
+      > <comment-title>Metagenome reference</comment-title>
+      > The alignment to automatically downloaded genomes for metagenomes is rather ambiguous and time-consuming. Most large-scale pipelines skip this step and set the **Maximum number of reference genomes (per each assembly) to download after searching in the SILVA database*** option to `0`.
+      {: .comment}
+
+      For each identified genomes, the genome fraction is given when clicking on **Genome fraction (%)**
+
+      > <question-title></question-title>
+      >
+      > 1. What is the genome fraction for ERR2231568? And for ERR2231572?
+      > 2. Which reference genome has the highest genome fraction for ERR2231568? And for ERR2231572?
+      >
+      > > <solution-title></solution-title>
+      > >
+      > > 1. The genome fraction is 29.429% for ERR2231568 and 60.463% for ERR2231572
+      > > 2. The highest genome fraction was found for *Leuconostoc pseudomesenteroides* for ERR2231568 (84.2%) and for *Lactobacillus vaccinostercus* for ERR2231572 (92.2%). The genomes of *Leuconostoc pseudomesenteroides* and *Lactobacillus vaccinostercus* could be then almost completely recovered from the assemblies of ERR2231568 and ERR2231572 respectively.
+      > >
+      > {: .solution}
+      >
+      {: .question}
+
+    - **Duplication ratio**: total number of aligned bases / genome fraction * reference length
+
+      If an assembly contains many contigs that cover the same regions of the reference, the duplication ratio may be much larger than 1.
+
+      > <question-title></question-title>
+      >
+      > 1. What is the duplication ratio for ERR2231568? And for ERR2231572?
+      > 2. Which reference genome has the highest duplication ratio for ERR2231568? And for ERR2231572?
+      >
+      > > <solution-title></solution-title>
+      > >
+      > > 1. The duplication ratio is 1.062 for ERR2231568 and 1.112 for ERR2231572 (column ERR2231572 in ERR2231572 report)
+      > > 2. The highest duplication ratio was found for *Gluconobacter oxydans* for ERR2231568 (1.156) and for *Lactobacillus pseudomesenteroides* for ERR2231572 (1.204).
+      > >
+      > {: .solution}
+      >
+      {: .question}
+
+2. **Read mapping**: results of the mapping of the raw reads on the different assemblies (only if the *"Reads options"* is not disabled)
+
+    > <question-title></question-title>
+    >
+    > 1. What is the % of read mapped for ERR2231568 assembly to ERR2231568 raw reads? And for ERR2231572 assembly to ERR2231572 raw reads?
+    > 2. What is the percentage of reads used to build the assemblies for ERR2231568? and ERR2231572?
+    >
+    > > <solution-title></solution-title>
+    > >
+    > > 1. 79.47% of ERR2231568 raw reads were mapped to ERR2231568 assembly and 86.98% of ERR2231572 raw reads to ERR2231572 assembly.
+    > > 2. 79.47% of reads were used to the assemblies for ERR2231568 and  86.98% for ERR2231572.
+    > {: .solution}
+    >
+    {: .question}
+
+    > <details-title>Alternative ways to compute coverage</details-title>
+    >
+    > There are 2 alternative ways to compute coverage:
+    > 1. Use [CoverM](https://github.com/wwood/CoverM), which is available in Galaxy
+    >
+    >    > <hands-on-title>Calculate coverage using CoverM</hands-on-title>
+    >    >
+    >    > 1. {% tool [CoverM contig](toolshed.g2.bx.psu.edu/repos/iuc/coverm_contig/coverm_contig/0.7.0+galaxy0) %} with parameters:
+    >    >    - *"Have the reads already been mapped to contigs?"*: `No`
+    >    >       - *"Assembly mode?"*: `Individual assembly (1 contig file per sample)`
+    >    >          - *"Read type"*: `Paired collection`
+    >    >             - {% icon param-collection %} *"Collection of paired-end FASTA/Q files(s) for mapping"*: `Raw reads`
+    >    >    - {% icon param-collection %} *"Contigs"*: output of MEGAGIT
+    >    >
+    >    > 2. Open the {% icon dataset-info %} "Dataset details" for ERR2231568
+    >    > 3. Expand the `Tool Standard Error`
+    >    {: .hands_on}
+    >
+    >    > <question-title></question-title>
+    >    >
+    >    > 1. What is the overall alignment rate for ERR2231568
+    >    > 2. What is the percentage of reads used in assemblies for ERR2231568?
+    >    > 3. Are the results similar to the ones in QUAST report?
+    >    >
+    >    > > <solution-title></solution-title>
+    >    > >
+    >    > > 1. The overall alignment rate for ERR2231567 is 75.48%
+    >    > > 2. 75.48% of the reads were used in assemblies for ERR2231567 and 73.67% for ERR2231571.
+    >    > > 3. Slighlty lower results that the ones found by QUAST (79.47% for ERR2231568)
+    >    > >
+    >    > {: .solution}
+    >    >
+    >    {: .question}
+    >
+    > 2. Map the original reads onto contigs and extract the percentage of mapped reads:
+    >
+    >    > <hands-on-title>Computation of the % reads used in assemblies</hands-on-title>
+    >    >
+    >    > 1. {% tool [Bowtie2](toolshed.g2.bx.psu.edu/repos/devteam/bowtie2/bowtie2/2.5.3+galaxy1) %} with the following parameters:
+    >    >    - *"Is this single or paired library"*: `Paired-end Dataset Collection`
+    >    >      - {% icon param-collection %} *"FASTQ Paired Dataset"*: `Raw reads`
+    >    >    - *"Will you select a reference genome from your history or use a built-in index?"*: `Use a genome from the history and build index`
+    >    >      - {% icon param-collection %} *"Select reference genome"*: MEGAHIT output
+    >    >    - *"Save the Bowtie2 mapping statistics to the history"*: `Yes`
+    >    > 3. Inspect the mapping statistics output
+    >    {: .hands_on}
+    >
+    >    > <question-title></question-title>
+    >    >
+    >    > 1. What is the overall alignment rate for ERR2231568? and ERR2231572?
+    >    > 2. What is the percentage of reads used in assemblies for ERR2231568? and ERR2231571?
+    >    > 3. Are the results similar to the ones in QUAST report?
+    >    >
+    >    > > <solution-title></solution-title>
+    >    > >
+    >    > > 1. The overall alignment rate for ERR2231568 is 65.67% and 78.42% for ERR2231572.
+    >    > > 2. 65.97% of the reads were used in assemblies for ERR2231568 and 78.42% for ERR2231572.
+    >    > > 3. Lower results that the ones found by QUAST (79.47% for ERR2231568, 86.98%  for ERR2231572)
+    >    > >
+    >    > {: .solution}
+    >    >
+    >    {: .question}
+    {: .details}
+
+3. **Misassemblies**: joining sequences that should not be adjacent.
+
+    QUAST identifies missassemblies by mapping the contigs to the reference genomes of the identified organisms. 3 types of misassemblies can be identified:
+
+    ![Image shows on the top a contig with a blue and a gren parts with white arrows (pointing on the right) on them and below a reference with 2 chromosomes. The 3 types of misassemblies are after schematized. Relocation: the blue and gren parts of the contig are on chr 1 but separated. Inversion: the blue and gren parts of the contig are on chr 1 but separated and with the arrows facing each other. Translocation: the blue part is on chr 1 and gren part on chr 2.](./images/quast_misassemblies.png "Source: <a href="https://quast.sourceforge.net/docs/manual.html#sec3.1.2">QUAST manual</a>"){:width="60%"}
+
+    1. **Relocation** occur based on signal from two mappings of the same contig against the same chromosome, with 2 cases:
+        1. the 2 mappings are separated by an unmapped region of at least 1 kbp
+        2. they map on the same chromosome with a shared mapping area of at least 1 kbp
+
+        ![Image shows on the top a contig with a blue and a gren parts with white arrows (pointing on the right) on them and below a reference with 2 chromosomes. The 3 types of misassemblies are after schematized. Relocation: the blue and gren parts of the contig are on chr 1 but separated. Inversion: the blue and gren parts of the contig are on chr 1 but separated and with the arrows facing each other. Translocation: the blue part is on chr 1 and gren part on chr 2.](./images/relocation.svg "Source: <a href="https:///blog.pierre.marijon.fr/misassemblies-in-noisy-assemblies/">Yet Another Bioinformatic blog by Pierre Marijon</a>"){:width="80%"}
+
+        > <question-title></question-title>
+        >
+        > 1. How many relocations has been found for ERR2231568? And for ERR2231572?
+        > 2. For which reference genomes are there the most relocation found for ERR2231568? And for ERR2231572?
+        >
+        > > <solution-title></solution-title>
+        > >
+        > > 1. 83 for ERR2231568 and 159 for ERR2231572
+        > > 2. *Leuconostoc pseudomesenteroides* and *Tatumella morbirosei* for ERR2231568 and *Lactobacillus hordei* for ERR2231572
+        > {: .solution}
+        >
+        {: .question}
+
+    2. **Translocation** occur when a contig has mapped on more than one reference chromosomes
+
+        > <question-title></question-title>
+        >
+        > 1. How many translocations has been found for ERR2231568? And for ERR2231572?
+        > 2. For which reference genomes are there the most translocations found for ERR2231568? And for ERR2231572?
+        > 3. What are the interspecies translocations?
+        > 4. How many interspecies translocations has been found for ERR2231568? And for ERR2231572?
+        >
+        > > <solution-title></solution-title>
+        > >
+        > > 1. 30 for ERR2231568 and 90 for ERR2231572.
+        > > 2. *Leuconostoc pseudomesenteroides* for ERR2231568 and *Lactobacillus vaccinostercus* for ERR2231572.
+        > > 3. Interspecies translocations are translocations where a contig has mapped on different reference genomes.
+        > > 4. 114 for ERR2231568 and 85 for ERR2231572.
+        > {: .solution}
+        >
+        {: .question}
+
+    3. **Inversion** occurs when a contig has two consecutive mappings on the same chromosome but in different strands
+
+        > <question-title></question-title>
+        >
+        > 1. How many inversion has been found for ERR2231568? And for ERR2231572?
+        > 2. For which reference genomes are there the most inversions found for ERR2231568? And for ERR2231572?
+        >
+        > > <solution-title></solution-title>
+        > >
+        > > 1. 4 for ERR2231568 and 9 for ERR2231572.
+        > > 2. *Tatumella morbirosei* for ERR2231568 and *Lactobacillus plantarum* for ERR2231572.
+        > {: .solution}
+        >
+        {: .question}
+
+4. **Mismatches** or mismatched bases in the contig-reference alignment
+
+    > <question-title></question-title>
+    >
+    > 1. How many mismatches have been identified for ERR2231568? And for ERR2231572?
+    > 2. For which reference genomes are there the most mismatches for ERR2231568? And for ERR2231572?
+    >
+    > > <solution-title></solution-title>
+    > >
+    > > 1. 469,292 for ERR2231568 and 279,694 for ERR2231572.
+    > > 2. *Pantoea rwandensis* for ERR2231568 and *Leuconostoc pseudomesenteroides* for ERR2231572.
+    > {: .solution}
+    >
+    {: .question}
+
+5. **Statistics without reference**
+
+    - **# contigs**: total number of contigs
+
+        > <question-title></question-title>
+        >
+        > 1. How many contigs are for ERR2231568? And for ERR2231572?
+        > 2. How many sequences are in the output of MEGAHIT for ERR2231568? And for ERR2231572?
+        > 3. Why are these numbers different from the number of sequences in the output of MEGAHIT?
+        > 4. Which statistics in the metaQUAST report corresponds to number of sequences in the output of MEGAHIT?
+        > 5. Which reference genomes have the most contigs ($$\geq$$ 500 bp) in ERR2231568? And in ERR2231572?
+        >
+        > > <solution-title></solution-title>
+        > >
+        > > 1. 66,434 contigs for ERR2231568 and 36,112 for ERR2231572.
+        > > 2. In the outputs of MEGAHIT, there are 228,719 contigs for ERR2231568 and 122,526 contigs.
+        > > 3. The numbers are lower in the metaQUAST results because metaQUAST reports there only the contigs longer than 500bp.
+        > > 4. The **# contigs (>= 0 bp)**
+        > > 5. Except the non aligned contigs, *Tatumella morbirosei* for ERR2231568 and *Leuconostoc brevis* for ERR2231572.
+        > {: .solution}
+        >
+        {: .question}
+
+    - **Largest contig**: length of the longest contig in the assembly
+
+        > <question-title></question-title>
+        >
+        > 1. What is the length of the longest contig in ERR2231568? And in ERR2231572?
+        > 2. Is the longest contig assigned to a reference genome in ERR2231568? And in ERR2231572?
+        >
+        > > <solution-title></solution-title>
+        > >
+        > > 1. 63,871 bp in ERR2231568 and 65,608 for ERR2231572.
+        > > 2. It is assigned to *Leuconostoc pseudomesenteroides KCTC 3652* in ERR2231568 and not assigned (`not_aligned`) in ERR2231572.
+        > {: .solution}
+        >
+        {: .question}
+
+    - **N50**: length for which the collection of all contigs of that length or longer covers at least half an assembly
+
+        N50 statistic defines assembly quality in terms of contiguity. If all contigs in an assembly are ordered by length, the N50 is the minimum length of contigs that contains 50% of the assembled bases. For example, an N50 of 10,000 bp means that 50% of the assembled bases are contained in contigs of at least 10,000 bp.
+
+        Another example. Let's consider 9 contigs with the lengths 2, 3, 4, 5, 6, 7, 8, 9, and 10:
+        - The sum of the length is 54
+        - Half of the sum is 27
+        - 10 + 9 + 8 = 27 (half the length of the sequence)
+        - N50 = 8, i.e. the size of the contig which, along with the larger contigs, contain half of sequence of a particular genome
+
+        > <question-title></question-title>
+        >
+        > 1. What is N50 for ERR2231568? And for ERR2231572?
+        > 2. What is N90?
+        >
+        > > <solution-title></solution-title>
+        > >
+        > > 1. 921 for ERR2231568 and 1,233 for ERR2231572.
+        > > 2. N90 is similar to the N50 metric but with 90% of of the sum of the lengths of all contigs
+        > {: .solution}
+        >
+        {: .question}
+
+        When comparing N50 values from different assemblies, the assembly sizes must be the same size in order for N50 to be meaningful.
+
+        Also the N50 alone is not a useful measure to assess the quality of an assembly. For example, the assemblies with the following contig lengths:
+        - 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 25, 25, 150, 1500
+        - 50, 500, 530, 650
+
+        Both assemblies have the same N50 although one is more contiguous than the other.
+
+    - **L50**: number of contigs equal to or longer than N50
+
+        In other words, L50, for example, is the minimal number of contigs that cover half the assembly.
+
+        If we take the previous example in N50, L50 = 3.
+
+        > <question-title></question-title>
+        >
+        > 1. What is the L50 for ERR2231568? And for ERR2231572?
+        >
+        > > <solution-title></solution-title>
+        > >
+        > > 1. 17,280 for ERR2231568 and 7,496 for ERR2231572.
+        > {: .solution}
+        >
+        {: .question}
+
+## Icarus contig browser
+
+Icarus generates contig size viewer and one or more contig alignment viewers (if reference genome/genomes are provided) that are accessible from the HTML report, by clicking on `View on Icarus contig browser`.
+
+### Contig size viewer
+
+This viewer draws contigs ordered from longest to shortest. Let's inspect this viewer for ERR2231568.
+
+> <question-title></question-title>
+>
+> Open the Contig size viewer for ERR2231568 and define start as `0` and end as `500000`
+>
+> ![Image shows on the Icarus Contig Size Viewer for ERR2231568, with a zoom between 0 500000. Below the menu, the contigs are drawn from the longest on the left to the shortest on the right. Each contig is filled with a different color: green for correct, red for misassembled, etc. Below the contigs is dispayed a bar to navigate through the contigs](./images/ERR2231568-contig-size-viewer.png)
+>
+> 1. What is the color of the first contig? Why?
+> 2. What is the red contig?
+>
+> > <solution-title></solution-title>
+> >
+> > 1. The first contig is white because >50% of the contigs is unaligned. By clicking on the contig, we see that only a small block is aligned: 223.41 – 223.65 kbp to Leuconostoc_pseudomesenteroides_KCTC_3652_NZ_BMBP01000002.1.
+> > 2. The red contig is a missamblied contig: it contains 2 blocks, with a translocation between them.
+> {: .solution}
+>
+{: .question}
+
+Click `Main menu` on the top left to go back to the main Icarus page.
+
+### Contig alignment viewer
+
+If a reference genome is provided, there should be a table on the main Icarus page that looks like:
+
+Genome | # fragments | Length, bp | Mean genome fraction, % | # misassembled blocks
+--- | --- | --- | --- | ---
+Gluconobacter oxydans H24 | 2 | 3 816 232 | 10.989 | 38
+Kosakonia cowanii | 5 | 4 806 998 | 28.224 | 60
+Lactococcus lactis subsp. lactis CV56 | 6 | 2 518 737 | 18.940 	23
+
+When clicking on the genome name, the contigs are displayed according to their mapping to the reference genome. The viewer can additionally visualize genes, operons, and read coverage distribution along the genome, if any of those were fed to QUAST.
+
+> <question-title></question-title>
+>
+> Open the Contig alignment viewer for ERR2231568 and *Leuconostoc pseudomesenteroides* KCTC 3652, the most covered by contigs
+>
+> ![Image shows on the Icarus alignment size viewer of ERR2231568 contigs for Leuconostoc pseudomesenteroides KCTC 3652. On the top are displayed the contigs aligend on the reference genome, with a zoom. Each contig is filled with a different color: green for correct, red for misassembled, etc. Below the contigs is dispayed a bar to navigate through the contigs. Below is a graph representing the GC percentage and coverage along the reference genome](./images/ERR2231568-contig-alignment-viewer-leuconostoc.png)
+>
+> 1. How are the organized the contigs on the top?
+> 2. What the different colors for the contigs?
+> 3. Why is there a big red block on the right?
+> 4. What is the graph on the bottom?
+>
+> > <solution-title></solution-title>
+> >
+> > 1. The contigs are displayed based on their mapping on the reference genome of *Leuconostoc pseudomesenteroides* KCTC 3652
+> > 2. The different colors represent the different status for the contig: correct contigs, correct contigs but with >50% of the contig unaligned, misassembled blocks. unchecked misassembled blocks, ambiguously mapped contigs, alternative blocks of misassembled contigs, etc.
+> > 3. The big red block on the right is contig k91_183138 with a misassembly on the left side, and overlap with 2 other contigs
+> > 4. The graph on the bottom represents the GC percentage and coverage by contigs along the reference genome
+> {: .solution}
+>
+{: .question}
+
+> <details-title>Visualization of the *de novo* assembly graph</details-title>
+>
+> Current metagenome assemblers like MEGAHIT and MetaSPAdes use **graphs**, most typically a de Bruijn graph to stich reads together. In an ideal case, the graph would contain one distinct path for each genome of each micro-organisms, but complexities such as repeated sequences usually prevent this.
+>
+> Assembly graphs contain then **branching structures**: one node may lead into multiple others. **Contigs** correspond to the longest sequences in the graph that can be determined unambiguously. They are the final results of most assembler. But the assembly graph contains more information. It can be useful for finding sections of the graph, such as rRNA, or to try to find parts of a genome.
+>
+> **Bandage** ({% cite wick2015bandage %}) is a tool creating interactive visualisations of assembly graphs.
+>
+> > <hands-on-title>Visualization the assembly graph</hands-on-title>
+> >
+> > 1. {% tool [megahit contig2fastg](toolshed.g2.bx.psu.edu/repos/iuc/megahit_contig2fastg/megahit_contig2fastg/1.1.3+galaxy10) %} with parameters:
+> >    - {% icon param-collection %} *"Contig file"*: Output of **MEGAHIT**
+> >    - *"K-mer length"*: `91`
+> >
+> >      > <comment-title></comment-title>
+> >      > To get the value, you need to
+> >      > 1. Go into the **MEGAHIT** output collection
+> >      > 2. Expand one of the contig file by clicking on it in the history
+> >      > 3. Check in the dataset peek the name of the contig
+> >      > 4. Extract the value after the first `k` in the contig names
+> >      {: .comment}
+> >
+> > 2. {% tool [Bandage Image](toolshed.g2.bx.psu.edu/repos/iuc/bandage/bandage_image/0.8.1+galaxy4) %} with parameters:
+> >    - {% icon param-collection %} *"Graphical Fragment Assembly"*: Output of **megahit contig2fastg**
+> >
+> > 3. Inspect the generated image for ERR2231571
+> {: .hands_on}
+>
+> ![Image shows the assembly graphs, with longer stretch on the top and many small contigs on the bottom](./images/ERR2231571_graph.jpg "Assembly graph for ERR2231571 sample")
+>
+> The graph is quite disconnected. On the top, we can see the longer stretches, that includes multiples contigs (each contig having a different color). On the bottom are the shortest stretches or single contigs.
+>
+> But it is really hard to read or extract any information from the graph. Let's inspect the information about the assembly graph
+>
+> > <hands-on-title>Visualization the *de novo* assembly graph</hands-on-title>
+> >
+> > 1. {% tool [Bandage Info](toolshed.g2.bx.psu.edu/repos/iuc/bandage/bandage_info/0.8.1+galaxy2) %} with parameters:
+> >    - {% icon param-collection %} *"Graphical Fragment Assembly"*: Output of **megahit contig2fastg**
+> >
+> > 2. {% tool [Column join](toolshed.g2.bx.psu.edu/repos/iuc/collection_column_join/collection_column_join/0.0.3) %} with parameters:
+> >    - {% icon param-collection %} *"Tabular files"*: Output of **Bandage Info**
+> >
+> > 3. Inspect the generated output
+> {: .hands_on}
+>
+> > <question-title></question-title>
+> >
+> > 1. How many nodes are in the graph for ERR2231568? And for ERR2231572? What does they correspond to?
+> > 2. How many edges are in the graph for ERR2231568? And for ERR2231572? What is the impact of these numbers in relation to the number of nodes on the graph?
+> > 3. How many connected components are there for ERR2231568? And for ERR2231572? What does they correspond to?
+> > 4. What is the percentage of dead ends are there for ERR2231568? And for ERR2231572?
+> > 5. What are the smallest and larges edge overlaps?
+> > 6. What is the largest component? For which sample?
+> > 7. What is the shortest node? What does they correspond to?
+> >
+> > > <solution-title></solution-title>
+> > >
+> > > 1. There are 228,719 nodes for ERR2231568 and 122,526 for ERR2231572. They correspond to the number of contigs
+> > > 2. There are 16,580 edges for ERR2231568 and 13,993 for ERR2231572. There are less edges than nodes in the graph. It means that many nodes/contigs are disconnected
+> > > 3. There are 212,598 connected components, i.e. number of regions of the graph which are disconnected from each other, for ERR2231568 and 109,044 for ERR2231572
+> > > 4. There are 94.0702% dead ends, i.e. the end of a node not connected to any other nodes, for ERR2231568 and 90.7032% for ERR2231572. It confirms the previous observation
+> > > 5. The smallest and larges edge overlaps are 91bp, i.e. the k-mer length
+> > > 6. The largest component is 340,003 bp for ERR2231567
+> > > 7. The shortest node is 200 bp, i.e. the minimal size for a contig
+> > >
+> > {: .solution}
+> >
+> {: .question}
+{: .details}
+
+# Conclusion
+
+Metagenomic data can be assembled to, ideally, obtain the genomes of the species that are represented within the input data. But metagenomic assembly is **complex** and there are
+- **different approaches** like de Bruijn graphs methods
+- **different strategies**, such as co-assembly, when we assembly all samples together, and individual assembly, when we assembly samples one by one
+- **different tools** like MetaSPAdes and MEGAHIT
+
+Once the choices made, metagenomic assembly can start:
+1. Input data are assembled to obtain contigs and sometimes scaffolds.
+2. Assembly quality is evaluated with various metrics.
+3. The assembly graph can be visualized.
+
+Once all these steps done, we can move to the next phase to build Metagenomics Assembled Genomes (MAGs): [metagenomic binning]({% link topics/microbiome/tutorials/metagenomics-binning/tutorial.md %}).

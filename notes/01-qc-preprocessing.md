@@ -73,6 +73,19 @@ shift — you see it instantly. Run MultiQC after *every* batch step (post-QC, p
 post-align) to track samples through the pipeline. It is the single highest-value, lowest-effort
 tool in this course.
 
+> **Long reads need different QC tools.** FastQC runs on long reads but its plots assume short,
+> fixed-length reads. For ONT/PacBio, reach for **Nanoplot** (read-length × quality distributions —
+> the long-read analog of the FastQC panels) and, for Nanopore *run* health, **PycoQC** (per-channel
+> activity, yield over time, basecall quality). For long reads the **read-length distribution** is
+> the headline metric: a healthy ONT run is long-tailed; a collapse toward short reads signals
+> degraded input or failing pores. (Long-read trimming/filtering tools — Porechop, filtlong — appear
+> in Module 2's assembly workflow.)
+
+> **QC also means "is this the right organism?"** A GC second-peak hints at contamination, but a
+> taxonomic screen makes it explicit: run **Kraken2 + Bracken** on the raw reads to confirm the
+> sample is mostly your target species and quantify any cross-species contamination before you commit
+> to assembly/alignment. (Full taxonomic profiling is Module 3c.)
+
 ---
 
 ## 4. Trimming & filtering tools
@@ -177,4 +190,5 @@ After this, your `sample_*.trim.fastq.gz` are clean inputs for Module 2.
 ## ↗ Try it in Galaxy (GUI alternative)
 
 Same logic, in a browser via the **Galaxy Training Network**:
-- [Quality Control](https://training.galaxyproject.org/training-material/topics/sequence-analysis/tutorials/quality-control/tutorial.html) — FastQC + MultiQC + trimming (Cutadapt/Trimmomatic), the GUI version of this module.
+- [Quality Control](https://training.galaxyproject.org/training-material/topics/sequence-analysis/tutorials/quality-control/tutorial.html) — FastQC + MultiQC + trimming (Cutadapt/Trimmomatic), **plus Nanoplot/PycoQC for long reads** — the GUI version of this module.
+- [Quality and contamination control in a bacterial isolate](https://training.galaxyproject.org/training-material/topics/sequence-analysis/tutorials/quality-contamination-control/tutorial.html) — adds the Kraken2/Bracken contamination screen described above.

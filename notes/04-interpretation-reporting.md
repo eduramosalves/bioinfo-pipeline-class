@@ -25,6 +25,8 @@ A figure is a debugging tool first, a communication tool second. Per domain:
   *look at the reads* under a call. Real variants show consistent support across many reads on both
   strands; artifacts cluster at read ends, on one strand, near homopolymers/indels, or in
   low-mappability regions. **Eyeballing a call in IGV catches false positives no filter does.**
+  (**JBrowse2** is the shareable, browser-based equivalent — same habit, and it embeds straight into
+  a report or shared workflow.)
 - **RNA-seq → volcano plot & MA plot.** *Volcano* (−log10 padj vs log2FC): significant, large-effect
   genes sit in the upper corners. *MA plot* (log fold-change vs mean expression): should be
   centered on zero — a tilt signals a normalization problem. Add **PCA of samples** to confirm
@@ -33,6 +35,11 @@ A figure is a debugging tool first, a communication tool second. Per domain:
   (Pharokka output) shows gene modules and orientation; **stacked bar / Krona** plots show
   community composition; a **coverage plot** confirms a phage contig is evenly covered (uneven
   coverage = misassembly or chimera).
+- **Structural / comparative → Circos.** For whole-genome comparisons, structural variants, copy
+  number, or B-allele frequency, a **Circos** plot lays multiple tracks around a circular ideogram —
+  the standard view for cancer-genome SV/CNV and for comparing genomes side by side. Powerful but
+  fiddly (it's an iterative, layer-by-layer build), so reach for it when a linear browser can't show
+  the relationships.
 
 > **Universal habit:** before reporting a result, *visualize the raw evidence behind it.* The
 > pipeline exiting 0 means it ran, not that it's right.
@@ -116,3 +123,5 @@ A report should let a reader **trust** and **reproduce** the work:
 
 Visualization, in a browser via the **Galaxy Training Network**:
 - [Genomic Data Visualisation with JBrowse2](https://training.galaxyproject.org/training-material/topics/visualisation/tutorials/jbrowse2/tutorial.html) — Galaxy's in-browser genome browser, the GUI analog of IGV in this module (load a BAM + VCF + reference and *look at the reads*).
+- [Visualisation with Circos](https://training.galaxyproject.org/training-material/topics/visualisation/tutorials/circos/tutorial.html) — circular genome plots for SV/CNV/comparative views (cancer-genomics worked example).
+- [IGV Introduction](https://training.galaxyproject.org/training-material/topics/introduction/tutorials/igv-introduction/tutorial.html) — the desktop viewer itself, end to end.

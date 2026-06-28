@@ -69,6 +69,14 @@ spades.py --meta -1 nonhost_R1.fq.gz -2 nonhost_R2.fq.gz -o metaspades_out -t 8 
 The output is an undifferentiated pile of contigs. The next step separates the viral wheat from the
 cellular chaff.
 
+> **The bacterial counterpart — binning into MAGs.** This module follows the *viral* contigs, but the
+> same assembly feeds the bacterial side: **binning** groups contigs into **MAGs**
+> (metagenome-assembled genomes) by tetranucleotide signature + per-sample coverage. The workflow is
+> **MetaBAT2 / MaxBin2** (bin) → **DAS Tool** or **Binette** (reconcile multiple binners) →
+> **CheckM** (completeness/contamination — the bacterial analog of CheckV) → **dRep** (de-replicate
+> near-identical genomes across samples). Reach for it when you want the *organisms* in the community,
+> not just the viruses.
+
 ---
 
 ## 4. Viral / phage identification
@@ -109,6 +117,11 @@ database:
   each read a taxon.
 - **Bracken** — re-estimates **abundance** at a chosen rank (e.g. species) from Kraken2 output;
   Kraken2 says "this read is genus X," Bracken says "genus X is 12% of the community."
+- **MetaPhlAn** — the **marker-gene** alternative: instead of classifying every read against a whole
+  database, it maps to clade-specific marker genes. Smaller database, often cleaner species/strain
+  abundances and fewer spurious low-level hits — but it only sees taxa with markers. A good
+  cross-check against Kraken2's k-mer view. Visualize either with **Krona** (interactive pie) or
+  **Pavian**.
 
 ```bash
 kraken2 --db kraken_db --paired nonhost_R1.fq.gz nonhost_R2.fq.gz \
@@ -137,6 +150,14 @@ pharokka.py -i my_phage.fasta -o pharokka_out -d pharokka_db -t 8
 Pharokka is preferred for phages because phage genes are poorly represented in generic bacterial
 databases (many "hypothetical protein" calls otherwise), and it understands phage-specific features
 (structural modules, lysis genes, integrases, packaging).
+
+> **Pathogen characterization (the bacterial outbreak angle).** When the recovered genome is a
+> *pathogen* rather than a phage, the annotation question shifts to: is it resistant, is it virulent,
+> what strain is it? **ABRicate** screens contigs against AMR and virulence-gene databases; **MLST**
+> assigns a sequence type for outbreak tracking; **bcftools consensus** / **medaka** build a
+> consensus genome, and **FastTree** places samples on a phylogeny to compare isolates. This is
+> exactly the Module 0 *Salmonella* colony-to-serotype example (serotype + 7-gene MLST + AMR), and
+> the GTN **foodborne pathogen-detection** tutorial walks the whole Nanopore arc end to end.
 
 ---
 
@@ -185,7 +206,9 @@ The production version of this is **nf-core/mag** (Module 5).
 
 The metagenomics arc, in a browser via the **Galaxy Training Network**:
 - [Assembly of metagenomic sequencing data](https://training.galaxyproject.org/training-material/topics/microbiome/tutorials/metagenomics-assembly/tutorial.html) — assemble the community.
-- [Taxonomic Profiling and Visualization](https://training.galaxyproject.org/training-material/topics/microbiome/tutorials/taxonomic-profiling/tutorial.html) — who is there.
-- [Pathogen detection from Nanopore data](https://training.galaxyproject.org/training-material/topics/microbiome/tutorials/pathogen-detection-from-nanopore-foodborne-data/tutorial.html).
+- [Binning of metagenomic sequencing data](https://training.galaxyproject.org/training-material/topics/microbiome/tutorials/metagenomics-binning/tutorial.html) — recover bacterial MAGs (MetaBAT2 → DAS Tool → CheckM → dRep).
+- [Remove contamination and host reads](https://training.galaxyproject.org/training-material/topics/microbiome/tutorials/host-removal/tutorial.html) — the host-removal step (§2) in the GUI.
+- [Taxonomic Profiling and Visualization](https://training.galaxyproject.org/training-material/topics/microbiome/tutorials/taxonomic-profiling/tutorial.html) — who is there (Kraken2/Bracken + MetaPhlAn + Krona).
+- [Pathogen detection from Nanopore data](https://training.galaxyproject.org/training-material/topics/microbiome/tutorials/pathogen-detection-from-nanopore-foodborne-data/tutorial.html) — AMR/virulence/MLST/consensus/phylogeny end to end.
 
 *(GTN's phage/virome coverage is thinner than this module — keep **geNomad / CheckV / Pharokka** as the CLI primary for viral identification, QC, and annotation.)*

@@ -72,6 +72,7 @@ analysis without a local conda setup.
 - **Training material (repo)** — https://github.com/galaxyproject/training-material
 - **Website** — https://training.galaxyproject.org/
 - **Papers** — Batut et al. 2018, *Cell Systems* (the GTN) · Hiltemann et al. 2023, *PLoS Comput Biol* (community-driven training)
+- **Local imported copies** — 35 module-aligned GTN tutorials are mirrored under [`galaxy/`](galaxy/INDEX.md) (CC-BY 4.0) with a per-module comparison against these notes in [`galaxy/COMPARISON.md`](galaxy/COMPARISON.md).
 
 By module (topic landing pages):
 - **Foundations** — [Introduction to Galaxy](https://training.galaxyproject.org/training-material/topics/introduction/)

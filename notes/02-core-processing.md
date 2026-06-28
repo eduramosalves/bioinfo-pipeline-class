@@ -96,8 +96,15 @@ long-read assemblers use overlap-based methods.
 | Assembler | Best for |
 |-----------|----------|
 | **SPAdes** | bacterial / small-genome short-read assembly; `--isolate`, `--meta` (= metaSPAdes), `--rna` modes |
+| **Shovill** | a SPAdes/SKESA *wrapper* tuned for **bacterial isolates** — trims, subsamples, assembles, and corrects in one fast pass; the pragmatic default for a single short-read bacterial genome |
 | **MEGAHIT** | large/complex **metagenomes**, memory-efficient and fast |
 | **Flye** | **long-read** assembly (ONT/PacBio); `--meta` for metagenomes; great for complete genomes |
+| **Unicycler** | **hybrid** (short + long) bacterial assembly — uses long reads to scaffold/resolve repeats and short reads for base accuracy; also does short-read-only |
+
+**Short + long together (hybrid).** When you have both Illumina and ONT/PacBio for one isolate, a
+hybrid assembly beats either alone: long reads span repeats to give contiguity, short reads supply
+per-base accuracy. **Unicycler** orchestrates this directly; the alternative is *long-read assemble
+then short-read polish* (next).
 
 ### Running an assembly
 ```bash
@@ -109,6 +116,15 @@ spades.py --isolate -1 sample_R1.trim.fastq.gz -2 sample_R2.trim.fastq.gz \
 # Long-read assembly
 flye --nano-raw reads.fastq.gz --out-dir flye_out --threads 4
 ```
+
+### Long-read prep & polishing
+Long-read assembly has two extra steps short-read work doesn't:
+- **Read prep first** — **Porechop** removes ONT adapters, **filtlong** length/quality-filters to
+  keep the best reads, and **Nanoplot** (Module 1) confirms the read-length profile.
+- **Polish after** — a raw long-read draft still carries indel/homopolymer errors. **Medaka**
+  (ONT consensus) polishes using the long reads; **Pilon** or **Polypolish** polish using *short*
+  reads when you have them (the second half of a hybrid strategy). Polishing is what lifts a Flye
+  draft from ~Q30 to near-finished quality.
 
 ### Judging a draft assembly
 A FASTA of contigs needs evaluation before you trust it:
@@ -123,6 +139,12 @@ A FASTA of contigs needs evaluation before you trust it:
   but fragmented assembly.
 - **Contamination/misassembly** — `QUAST` for general assembly stats; CheckV/CheckM for
   contamination of viral/bacterial genomes.
+- **Base accuracy (reference-free)** — **Merqury** compares *k*-mers in the assembly against k-mers
+  in the raw reads to estimate a **QV** (consensus quality) and k-mer completeness — no reference
+  needed, which is exactly the assembly situation.
+- **Look at the graph** — **Bandage** visualizes the assembly *graph* (not just the contigs): a
+  clean genome is a few long, untangled paths; a hairball of short, branching nodes means repeats or
+  contamination the linear FASTA hides.
 
 > **N50 caveat:** N50 rewards length, not correctness. A tool can boost N50 by aggressively
 > joining contigs and introducing misassemblies. Always pair N50 with a completeness/contamination
@@ -175,4 +197,4 @@ reads, and assemble + identify on a phage genome.
 
 Both forks of this module, in a browser via the **Galaxy Training Network**:
 - **ALIGN** → [Mapping](https://training.galaxyproject.org/training-material/topics/sequence-analysis/tutorials/mapping/tutorial.html) (BWA-MEM / Bowtie2).
-- **ASSEMBLE** → [An Introduction to Genome Assembly](https://training.galaxyproject.org/training-material/topics/assembly/tutorials/general-introduction/tutorial.html), then [MRSA from Illumina](https://training.galaxyproject.org/training-material/topics/assembly/tutorials/mrsa-illumina/tutorial.html) (short-read) or [from Nanopore](https://training.galaxyproject.org/training-material/topics/assembly/tutorials/mrsa-nanopore/tutorial.html) (long-read/Flye), plus [Assembly Quality Control](https://training.galaxyproject.org/training-material/topics/assembly/tutorials/assembly-quality-control/tutorial.html) (QUAST/BUSCO).
+- **ASSEMBLE** → [An Introduction to Genome Assembly](https://training.galaxyproject.org/training-material/topics/assembly/tutorials/general-introduction/tutorial.html), then [MRSA from Illumina](https://training.galaxyproject.org/training-material/topics/assembly/tutorials/mrsa-illumina/tutorial.html) (short-read/Shovill) or [from Nanopore](https://training.galaxyproject.org/training-material/topics/assembly/tutorials/mrsa-nanopore/tutorial.html) (long-read/Flye + polishing), and [Hybrid assembly](https://training.galaxyproject.org/training-material/topics/assembly/tutorials/hybrid_denovo_assembly/tutorial.html) (Nanopore + Illumina/Unicycler), plus [Assembly Quality Control](https://training.galaxyproject.org/training-material/topics/assembly/tutorials/assembly-quality-control/tutorial.html) (QUAST/BUSCO/Merqury).
