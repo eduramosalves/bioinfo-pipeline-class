@@ -1,0 +1,132 @@
+/* @theme brand */
+/* ============================================================
+   Marp theme — Bioinfo Pipeline Class
+   Mirrors ~/estudio/knowledge/brandbook.md v1.0 + brand-tokens.css
+   Scientific dark · teal→violet · Exo / Roboto Mono · SVG icons only.
+   Tokens copied here (brandbook endorses "@import/copiar") so the
+   theme is self-contained and portable for marp-cli / CI.
+   ============================================================ */
+
+@import 'default';
+@import url('https://fonts.googleapis.com/css2?family=Exo:wght@400;500;600;700;800&family=Roboto+Mono:wght@400;500&display=swap');
+
+:root {
+  /* base / text / accents (brand-tokens.css) */
+  --bg:#080C18; --bg-grad-1:#0A1024; --bg-grad-2:#080C18; --bg-grad-3:#0B0A1C;
+  --fg:#F4F7FF; --muted:#9CA8C4;
+  --teal:#2DD4BF; --teal-deep:#22D3EE; --violet:#A78BFA;
+  --surface:rgba(255,255,255,.04); --surface-border:rgba(255,255,255,.09);
+  --font-display:'Exo', system-ui, sans-serif;
+  --font-mono:'Roboto Mono', ui-monospace, monospace;
+  --radius-card:16px;
+
+  /* Lucide 'workflow' icon as a mask (SVG only — brandbook §5, never emoji) */
+  --icon-workflow:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect width='8' height='8' x='3' y='3' rx='2'/%3E%3Cpath d='M7 11v4a2 2 0 0 0 2 2h4'/%3E%3Crect width='8' height='8' x='13' y='13' rx='2'/%3E%3C/svg%3E");
+}
+
+/* ---- slide canvas: brand background with teal + violet glows ---- */
+section {
+  background:
+    radial-gradient(900px 520px at 12% -8%, rgba(45,212,191,.18), transparent 60%),
+    radial-gradient(820px 560px at 100% 115%, rgba(167,139,250,.22), transparent 58%),
+    linear-gradient(160deg, var(--bg-grad-1) 0%, var(--bg-grad-2) 55%, var(--bg-grad-3) 100%);
+  color:var(--fg);
+  font-family:var(--font-mono);
+  font-weight:400;
+  font-size:25px;
+  line-height:1.5;
+  padding:62px 72px;
+}
+
+/* ---- typography ---- */
+h1 {
+  font-family:var(--font-display); font-weight:800; font-size:56px;
+  letter-spacing:-0.5px; line-height:1.08; margin:0 0 .35em;
+  background:linear-gradient(95deg, var(--teal-deep) 0%, var(--teal) 30%, var(--violet) 95%);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+h2 {
+  font-family:var(--font-display); font-weight:700; font-size:40px;
+  letter-spacing:-0.3px; line-height:1.12; color:var(--fg); margin:0 0 .5em;
+}
+h3 { font-family:var(--font-display); font-weight:600; font-size:27px; color:var(--fg); margin:.3em 0; }
+
+strong { color:#CFF6EE; font-weight:600; }
+em { font-style:italic; color:#CBB8FF; }
+a { color:var(--teal-deep); text-decoration:none; }
+
+ul, ol { margin:.25em 0; padding-left:1.1em; }
+li { margin:.34em 0; }
+li::marker { color:var(--teal); }
+
+/* ---- eyebrow (mono, uppercase, teal) ---- */
+.eyebrow {
+  display:inline-flex; align-items:center; gap:.55em;
+  font-family:var(--font-mono); font-size:16px; font-weight:500;
+  letter-spacing:.30em; text-transform:uppercase; color:var(--teal);
+  margin:0 0 .15em;
+}
+
+/* ---- code ---- */
+code {
+  font-family:var(--font-mono); font-size:.82em; color:#CFF6EE;
+  background:rgba(255,255,255,.05); border:1px solid var(--surface-border);
+  border-radius:6px; padding:.06em .35em;
+}
+pre {
+  background:var(--surface); border:1px solid var(--surface-border);
+  border-radius:var(--radius-card); padding:18px 22px;
+  font-size:19px; line-height:1.45; backdrop-filter:blur(2px);
+}
+pre code { background:none; border:none; padding:0; color:#D7E6FF; font-size:1em; }
+
+/* ---- callout boxes (the "big idea" / speaker emphasis quotes) ---- */
+blockquote {
+  background:var(--surface); border:1px solid var(--surface-border);
+  border-left:3px solid var(--teal); border-radius:var(--radius-card);
+  padding:16px 22px; margin:.5em 0; color:#E7ECFA;
+  box-shadow:0 0 26px rgba(167,139,250,.10);
+}
+blockquote strong { color:var(--teal); }
+
+/* ---- tables (scoped under `section` to beat the default theme) ---- */
+section table { border-collapse:collapse; font-size:20px; width:100%; table-layout:fixed; }
+section th, section td {
+  border:1px solid var(--surface-border); padding:8px 14px; text-align:left;
+  vertical-align:top; white-space:normal; overflow-wrap:anywhere; word-break:normal;
+  color:#E7ECFA;
+}
+section th {
+  font-family:var(--font-mono); text-transform:uppercase; letter-spacing:.05em;
+  color:var(--teal); background:rgba(255,255,255,.04); font-weight:500; font-size:15px;
+}
+/* let a leading narrow column (tool / module name) stay compact */
+section table th:first-child, section table td:first-child { width:26%; }
+
+/* ---- pagination ---- */
+section::after { color:var(--muted); font-family:var(--font-mono); font-size:14px; }
+
+/* ============================================================
+   Per-slide classes (set with `<!-- _class: ... -->`)
+   ============================================================ */
+
+/* title / section-lead: vertically centered, bigger display */
+section.lead { display:flex; flex-direction:column; justify-content:center; }
+section.lead h1 { font-size:66px; }
+section.lead h2 { color:var(--muted); font-weight:500; }
+
+/* skeleton navigation slides: prepend the SVG 'workflow' icon to the heading */
+section.skeleton h2::before {
+  content:""; display:inline-block; width:32px; height:32px; margin-right:14px;
+  vertical-align:-5px; background-color:var(--teal);
+  -webkit-mask:var(--icon-workflow) center/contain no-repeat;
+  mask:var(--icon-workflow) center/contain no-repeat;
+}
+
+/* the recurring skeleton pipeline strip (a fenced code block reads fine,
+   but `.pipeline` gives it the brand gradient when used as inline HTML) */
+.pipeline {
+  font-family:var(--font-mono); font-size:20px; letter-spacing:.02em;
+  color:var(--muted);
+}
+.pipeline .here { color:var(--teal); font-weight:500; }

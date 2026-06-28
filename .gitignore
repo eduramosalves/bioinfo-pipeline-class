@@ -1,0 +1,5 @@
+# Claude Code local config
+.claude/
+
+# Claude Design export archives (redundant with the extracted project folder)
+*.zip
