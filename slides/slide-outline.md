@@ -372,3 +372,10 @@ Design → QC → Preprocess → [ALIGN ⟋ ASSEMBLE] → Downstream → Interpr
   blocks.
 - The [skeleton] skeleton slides are your navigation anchors — never skip them; they're how the audience
   keeps orientation across a long session.
+- **Galaxy (GUI) companion.** Each module's speaker notes in `deck.md` carry a "GUI alternative (GTN)"
+  pointer to the matching [Galaxy Training Network](https://training.galaxyproject.org/) tutorial —
+  same stages/tools, web interface, no terminal. Mention it for mixed-skill audiences or when conda
+  setup is a barrier; the course stays CLI-first. Full map in `resources/references.md`. Per module:
+  M0→introduction · M1→sequence-analysis/quality-control · M2→sequence-analysis/mapping +
+  assembly · M3a→variant-analysis · M3b→transcriptomics · M3c→microbiome (phage/virome thinner,
+  keep geNomad/CheckV/Pharokka CLI) · M4→visualisation/jbrowse2 · M5→galaxy-interface/workflows.

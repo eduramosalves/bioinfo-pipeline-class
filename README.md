@@ -85,3 +85,10 @@ Tool names (BWA, GATK, STAR, Salmon, SPAdes, geNomad, ...) change over the years
 do not. Every module leads with the concept and the file format, then names current tools as
 interchangeable implementations. When a tool is deprecated, you will still know what slot it
 filled and what to swap in.
+
+## A note on Galaxy (GUI companion)
+
+This course is command-line first, but every module ends with a **"↗ Try it in Galaxy"** pointer to
+the matching [Galaxy Training Network](https://training.galaxyproject.org/) tutorial — the same
+stages and tools through a web interface, no terminal required. Useful for mixed-skill audiences or
+running an analysis without a local conda setup. See `resources/references.md` for the full map.

@@ -163,3 +163,13 @@ checks for normalization artifacts.
 3. At p < 0.05 over 18,000 tests, ~0.05 × 18,000 = **~900 false positives by chance**, so a large
    chunk of the 1,100 could be noise. **Benjamini–Hochberg FDR** (the `padj` column) controls this.
 </details>
+
+---
+
+## ↗ Try it in Galaxy (GUI alternative)
+
+The reads → counts → differential-expression arc, in a browser via the **Galaxy Training Network**:
+- [Reference-based RNA-Seq data analysis](https://training.galaxyproject.org/training-material/topics/transcriptomics/tutorials/ref-based/tutorial.html) — spliced alignment → counts → DE end-to-end.
+- [RNA-Seq reads to counts](https://training.galaxyproject.org/training-material/topics/transcriptomics/tutorials/rna-seq-reads-to-counts/tutorial.html) then [counts to genes](https://training.galaxyproject.org/training-material/topics/transcriptomics/tutorials/rna-seq-counts-to-genes/tutorial.html) — the count-matrix → DE step in detail.
+
+*(GTN leans HISAT2/featureCounts + limma-voom/DESeq2; there is no standalone Salmon tutorial, but the normalization and FDR concepts here apply unchanged.)*

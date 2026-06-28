@@ -73,7 +73,8 @@ Design → QC → Preprocess → Core (ALIGN / ASSEMBLE) → Downstream → Inte
 
 - What a pipeline is; why we formalize it: **reproducibility, scale, reasoning**
 
-<!-- "Pipeline = plumbing; junctions are file formats." Most pain is format-wrangling. -->
+<!-- "Pipeline = plumbing; junctions are file formats." Most pain is format-wrangling. GUI alternative (GTN): Galaxy Basics for genomics → training.galaxyproject.org/training-material/topics/introduction/ -->
+
 
 ---
 
@@ -277,7 +278,7 @@ Design → [QC] → [PREPROCESS] → Core → Downstream → Interpret → Repro
 
 - Garbage in → garbage out; **cheapest place to catch disaster**
 
-<!-- Raw FASTQ is NOT trustworthy raw material — adapters, low-qual tails, contaminants. -->
+<!-- Raw FASTQ is NOT trustworthy raw material — adapters, low-qual tails, contaminants. GUI alternative (GTN): Quality Control → training.galaxyproject.org/training-material/topics/sequence-analysis/tutorials/quality-control/tutorial.html -->
 
 ---
 
@@ -343,7 +344,7 @@ Design → QC → Preprocess → [ ALIGN / ASSEMBLE ] → Downstream → Interpr
 
 - Everything before = **shared**; everything after = **diverges here**
 
-<!-- The single most important conceptual slide. Slow down. -->
+<!-- The single most important conceptual slide. Slow down. GUI alternative (GTN): Mapping (align) + Genome Assembly intro (assemble) → topics/sequence-analysis/tutorials/mapping/ and topics/assembly/tutorials/general-introduction/ -->
 
 ---
 
@@ -422,7 +423,7 @@ samtools index s.bam ; samtools flagstat s.bam
 
 - BAM → where & how does the sample differ → **does it matter?**
 
-<!-- This branch consumes the aligned BAM. Germline vs somatic. -->
+<!-- This branch consumes the aligned BAM. Germline vs somatic. GUI alternative (GTN): Microbial Variant Calling (bacterial) / Exome-seq (clinical) → topics/variant-analysis/ -->
 
 ---
 
@@ -493,7 +494,7 @@ chr7  ...  . G   A   312  PASS   DP=54  GT:AD:DP 0/1:27,27:54
 
 - Measure how much each gene is expressed; the twist: **introns removed → reads span junctions**
 
-<!-- Why DNA aligners don't suffice for mRNA. -->
+<!-- Why DNA aligners don't suffice for mRNA. GUI alternative (GTN): Reference-based RNA-Seq + reads-to-counts/counts-to-genes → topics/transcriptomics/ -->
 
 ---
 
@@ -563,7 +564,7 @@ GENE_B      2      0       3       1
 
 - Novel, uncultured genomes; **no single reference** · lean: virome / phage
 
-<!-- Why assemble not align — alignment only sees the known. -->
+<!-- Why assemble not align — alignment only sees the known. GUI alternative (GTN): Metagenomics assembly + Taxonomic profiling → topics/microbiome/ (phage/virome coverage thinner — geNomad/CheckV/Pharokka stay CLI primary) -->
 
 ---
 
@@ -625,7 +626,7 @@ GENE_B      2      0       3       1
 
 - Numbers → **defensible biological claims**; visualize **before** you believe
 
-<!-- Pipeline exiting 0 means it ran, not that it's right. -->
+<!-- Pipeline exiting 0 means it ran, not that it's right. GUI alternative (GTN): JBrowse2 genome visualisation → topics/visualisation/tutorials/jbrowse2/tutorial.html -->
 
 ---
 
@@ -674,7 +675,7 @@ GENE_B      2      0       3       1
 
 > Everything you did by hand, **nf-core runs for you** — now you can trust / configure / debug it.
 
-<!-- THE punchline. They understand each stage now, so the pipelines aren't black boxes. -->
+<!-- THE punchline. They understand each stage now, so the pipelines aren't black boxes. GUI alternative (GTN): Galaxy is itself a GUI workflow manager with provenance by default — Creating/editing workflows + the history system → topics/galaxy-interface/ -->
 
 ---
 
@@ -698,5 +699,6 @@ GENE_B      2      0       3       1
 ## Now: the hands-on lab — align + call on *E. coli*, assemble + identify on a phage
 
 - Notes: `notes/00–05` · Lab: `hands-on/tutorial.md` · Refs: `resources/references.md`
+- Prefer a GUI? Each module has a **↗ Try it in Galaxy** pointer → [Galaxy Training Network](https://training.galaxyproject.org/)
 
 <!-- Hand off to the lab. Create the env first: mamba env create -f hands-on/environment.yml. -->

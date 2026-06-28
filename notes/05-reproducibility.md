@@ -139,3 +139,12 @@ Even with a workflow manager, record:
 3. **sarek → variant calling (3a)**, **rnaseq → RNA-seq (3b)**, **mag → metagenomics/phage (3c)**.
    Each is a validated, containerized implementation of the by-hand workflow in that module.
 </details>
+
+---
+
+## ↗ Try it in Galaxy (GUI alternative)
+
+Galaxy is itself a reproducibility platform — a **GUI workflow manager** alongside the
+Nextflow/Snakemake CLI tools here, with provenance captured by default. Via the **Galaxy Training Network**:
+- [Creating, Editing and Importing Galaxy Workflows](https://training.galaxyproject.org/training-material/topics/galaxy-interface/tutorials/workflow-editor/tutorial.html) — declare a pipeline visually.
+- [Understanding the Galaxy history system](https://training.galaxyproject.org/training-material/topics/galaxy-interface/tutorials/history/tutorial.html) — every step, tool, and parameter recorded automatically.

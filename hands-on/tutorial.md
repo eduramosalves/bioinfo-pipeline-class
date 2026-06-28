@@ -224,6 +224,14 @@ versions (`environment.lock.yml`), and every command is logged in `commands.sh`.
 versions of these passes are **nf-core/sarek** (variants) and **nf-core/mag** (metagenomes) — now
 you understand what they do under the hood.
 
+> **Same lab, in a browser (Galaxy).** If the conda setup is a barrier, the **Galaxy Training
+> Network** runs the identical logic through a web GUI:
+> - Reference-based pass → [Microbial Variant Calling](https://training.galaxyproject.org/training-material/topics/variant-analysis/tutorials/microbial-variants/tutorial.html) (align + call on a bacterial genome).
+> - Assembly-based pass → [Genome Assembly (MRSA, Illumina)](https://training.galaxyproject.org/training-material/topics/assembly/tutorials/mrsa-illumina/tutorial.html) + [Assembly Quality Control](https://training.galaxyproject.org/training-material/topics/assembly/tutorials/assembly-quality-control/tutorial.html).
+>
+> The tools differ slightly (e.g. Snippy in the GTN vs `bcftools` here), but the *stages and the
+> file formats are the same* — which is the whole point of the skeleton.
+
 ### Final checkpoint
 1. You ran the *same* QC + trim front half for both passes, then diverged. At which file/format did
    the two passes stop sharing steps, and why?

@@ -168,3 +168,11 @@ reads, and assemble + identify on a phage genome.
    contamination (host DNA, another organism); (iii) unremoved adapters or untrimmed low-quality
    reads failing to map. Check the reference identity and revisit Module 1 QC.
 </details>
+
+---
+
+## ↗ Try it in Galaxy (GUI alternative)
+
+Both forks of this module, in a browser via the **Galaxy Training Network**:
+- **ALIGN** → [Mapping](https://training.galaxyproject.org/training-material/topics/sequence-analysis/tutorials/mapping/tutorial.html) (BWA-MEM / Bowtie2).
+- **ASSEMBLE** → [An Introduction to Genome Assembly](https://training.galaxyproject.org/training-material/topics/assembly/tutorials/general-introduction/tutorial.html), then [MRSA from Illumina](https://training.galaxyproject.org/training-material/topics/assembly/tutorials/mrsa-illumina/tutorial.html) (short-read) or [from Nanopore](https://training.galaxyproject.org/training-material/topics/assembly/tutorials/mrsa-nanopore/tutorial.html) (long-read/Flye), plus [Assembly Quality Control](https://training.galaxyproject.org/training-material/topics/assembly/tutorials/assembly-quality-control/tutorial.html) (QUAST/BUSCO).

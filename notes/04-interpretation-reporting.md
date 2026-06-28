@@ -109,3 +109,10 @@ A report should let a reader **trust** and **reproduce** the work:
    **databases used** for annotation (e.g. gnomAD/ClinVar version), and the **command lines /
    workflow**. Tool names without versions/params are not reproducible.
 </details>
+
+---
+
+## ↗ Try it in Galaxy (GUI alternative)
+
+Visualization, in a browser via the **Galaxy Training Network**:
+- [Genomic Data Visualisation with JBrowse2](https://training.galaxyproject.org/training-material/topics/visualisation/tutorials/jbrowse2/tutorial.html) — Galaxy's in-browser genome browser, the GUI analog of IGV in this module (load a BAM + VCF + reference and *look at the reads*).

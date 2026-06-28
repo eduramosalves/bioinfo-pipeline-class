@@ -178,3 +178,14 @@ The production version of this is **nf-core/mag** (Module 5).
    database). Phage genes are sparsely represented in generic bacterial databases, so Prokka labels
    many as "hypothetical"; a phage-tuned tool assigns real functions to far more of them.
 </details>
+
+---
+
+## ↗ Try it in Galaxy (GUI alternative)
+
+The metagenomics arc, in a browser via the **Galaxy Training Network**:
+- [Assembly of metagenomic sequencing data](https://training.galaxyproject.org/training-material/topics/microbiome/tutorials/metagenomics-assembly/tutorial.html) — assemble the community.
+- [Taxonomic Profiling and Visualization](https://training.galaxyproject.org/training-material/topics/microbiome/tutorials/taxonomic-profiling/tutorial.html) — who is there.
+- [Pathogen detection from Nanopore data](https://training.galaxyproject.org/training-material/topics/microbiome/tutorials/pathogen-detection-from-nanopore-foodborne-data/tutorial.html).
+
+*(GTN's phage/virome coverage is thinner than this module — keep **geNomad / CheckV / Pharokka** as the CLI primary for viral identification, QC, and annotation.)*

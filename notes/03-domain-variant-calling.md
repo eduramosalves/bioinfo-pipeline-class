@@ -201,3 +201,12 @@ bcftools stats sample.filt.vcf.gz | grep "number of SNPs:"
    base a clinical decision on it; report it as uncertain and note what evidence (e.g. functional
    data, segregation) would resolve it.
 </details>
+
+---
+
+## ↗ Try it in Galaxy (GUI alternative)
+
+The variant-calling arc, in a browser via the **Galaxy Training Network**:
+- [Microbial Variant Calling](https://training.galaxyproject.org/training-material/topics/variant-analysis/tutorials/microbial-variants/tutorial.html) — bacterial calling, closest to this module's `bcftools` *E. coli* lab.
+- [Exome sequencing for diagnosing a genetic disease](https://training.galaxyproject.org/training-material/topics/variant-analysis/tutorials/exome-seq/tutorial.html) — germline/clinical (the ACMG end of this module).
+- [Somatic & germline variants from tumor/normal pairs](https://training.galaxyproject.org/training-material/topics/variant-analysis/tutorials/somatic-variants/tutorial.html) — the Mutect2 case.

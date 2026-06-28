@@ -63,6 +63,28 @@ the papers explain *why* a method works.
 
 ---
 
+## Galaxy Training Network (GUI companion)
+
+GUI-based, step-by-step companions to the command-line workflows in these notes — same tools and
+stages, no terminal required. Good for orientation, teaching mixed-skill audiences, or running an
+analysis without a local conda setup.
+
+- **Training material (repo)** — https://github.com/galaxyproject/training-material
+- **Website** — https://training.galaxyproject.org/
+- **Papers** — Batut et al. 2018, *Cell Systems* (the GTN) · Hiltemann et al. 2023, *PLoS Comput Biol* (community-driven training)
+
+By module (topic landing pages):
+- **Foundations** — [Introduction to Galaxy](https://training.galaxyproject.org/training-material/topics/introduction/)
+- **QC, alignment** — [Sequence analysis](https://training.galaxyproject.org/training-material/topics/sequence-analysis/)
+- **Assembly** — [Assembly](https://training.galaxyproject.org/training-material/topics/assembly/)
+- **Variant calling (3a)** — [Variant analysis](https://training.galaxyproject.org/training-material/topics/variant-analysis/)
+- **RNA-seq (3b)** — [Transcriptomics](https://training.galaxyproject.org/training-material/topics/transcriptomics/)
+- **Phage / metagenomics (3c)** — [Microbiome](https://training.galaxyproject.org/training-material/topics/microbiome/)
+- **Interpretation** — [Visualisation](https://training.galaxyproject.org/training-material/topics/visualisation/)
+- **Reproducibility** — [Galaxy interface & workflows](https://training.galaxyproject.org/training-material/topics/galaxy-interface/)
+
+---
+
 ## File-format specifications (hts-specs)
 All canonical specs live at https://samtools.github.io/hts-specs/ — SAM/BAM, CRAM, VCF/BCF.
 - FASTQ + Phred encoding overview: Cock et al. 2010, *Nucleic Acids Research*

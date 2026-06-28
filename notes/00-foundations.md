@@ -302,3 +302,12 @@ letter in FASTQ, a CIGAR mismatch in BAM, and a genotyped row in VCF. The *forma
 3. The **VCF** came from Module 3a (variant calling); the **BAM** from Module 2 (core
    processing / alignment). The BAM is the *input* to the caller — the **BAM → VCF** junction.
 </details>
+
+---
+
+## ↗ Try it in Galaxy (GUI alternative)
+
+Prefer a no-command-line path? The **Galaxy Training Network (GTN)** mirrors this course's
+stages in a web interface — useful for getting oriented before (or instead of) the conda setup:
+- [Galaxy Basics for genomics](https://training.galaxyproject.org/training-material/topics/introduction/tutorials/galaxy-intro-101/tutorial.html) — the interface, histories, running your first tool.
+- [NGS data logistics](https://training.galaxyproject.org/training-material/topics/introduction/tutorials/galaxy-intro-ngs-data-managment/tutorial.html) — getting reads/references in and understanding the file formats above.

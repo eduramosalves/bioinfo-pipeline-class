@@ -171,3 +171,10 @@ After this, your `sample_*.trim.fastq.gz` are clean inputs for Module 2.
    the wrong R1 with the wrong R2. A pair-aware tool drops/keeps mates together and routes orphans
    to a separate file.
 </details>
+
+---
+
+## ↗ Try it in Galaxy (GUI alternative)
+
+Same logic, in a browser via the **Galaxy Training Network**:
+- [Quality Control](https://training.galaxyproject.org/training-material/topics/sequence-analysis/tutorials/quality-control/tutorial.html) — FastQC + MultiQC + trimming (Cutadapt/Trimmomatic), the GUI version of this module.
