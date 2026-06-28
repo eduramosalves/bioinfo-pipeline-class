@@ -66,6 +66,7 @@ Design → QC → Preprocess → [ALIGN ⟋ ASSEMBLE] → Downstream → Interpr
 - Mechanism: fragment → adapter ligate → cluster amplify → SBS → FASTQ
 - Highest accuracy & throughput — Q30+, billions of reads per run; cheapest per base
 - Short-read limit: cannot span long repeats or resolve large SVs
+- *Image (right):* MiSeqDx sequencer + flow-cell consumable (`images/images_illumina/`)
 - *Speaker note:* The short-read workhorse behind the Illumina branch. Walk the four-step loop:
   library prep → cluster amplification → SBS imaging → FASTQ. Sell the strengths then be honest
   about the limit: short reads can't span repeats, which is exactly why this branch uses BWA/Bowtie2
@@ -76,6 +77,7 @@ Design → QC → Preprocess → [ALIGN ⟋ ASSEMBLE] → Downstream → Interpr
 - (B) Cluster amplification: bridge-amplify each fragment into a clonal cluster on the flow cell
 - (C) Sequencing-by-synthesis: add one fluorescent reversible-terminator per cycle → image → cleave → repeat
 - (D) Alignment & analysis: align reads to reference → call variants/counts
+- *Image (right, 50%):* Illumina SBS 4-panel figure A/B/C/D (`images/images_illumina/illumina-sbs-workflow.jpg`)
 - *Speaker note:* The real SBS methodology in the order it runs. Emphasize that the adapter index
   is what lets many samples share one run (multiplexing). The cluster step is why the signal is
   detectable — one molecule produces no signal; a clonal cluster does.
@@ -84,6 +86,7 @@ Design → QC → Preprocess → [ALIGN ⟋ ASSEMBLE] → Downstream → Interpr
 - Fragment shear gDNA to target insert size
 - Ligate P5/P7 adapters + sample index onto both ends (A·T overhang)
 - Every fragment now has: flow-cell hybridization handle + amplification primer + sequencing primer + barcode
+- *Image (right):* adapters ligated to fragment ends (`images/images_illumina/illumina-library-prep.jpg`)
 - *Speaker note:* A zoom on step (A). The adapters are the handles that let the fragment do everything
   else — hybridize to the flow cell, get amplified, and get sequenced. The index inside the adapter
   is what enables multiplexing: many samples, one run, demultiplexed by barcode.
@@ -92,6 +95,7 @@ Design → QC → Preprocess → [ALIGN ⟋ ASSEMBLE] → Downstream → Interpr
 - BeadArray SNP genotyping — NOT sequencing-by-synthesis
 - (1) 200–400 ng gDNA → (2) PCR-free whole-genome amplification → (3) fragment
 - (4) Hybridize to 50-mer locus-specific probes → single-base extension with fluorescent dNTP → genotype by color
+- *Image (right, tall):* full Infinium workflow — gDNA → WGA → fragment → two-step allele detection (`images/images_illumina/illumina-genotyping-workflow.jpg`)
 - *Speaker note:* Flag this explicitly: the Infinium array is a completely different Illumina platform.
   No flow cell, no cluster amplification, no per-base quality string — you get a genotype call per
   probe (0/0, 0/1, 1/1), not sequence reads. Students confuse the two.
@@ -100,6 +104,7 @@ Design → QC → Preprocess → [ALIGN ⟋ ASSEMBLE] → Downstream → Interpr
 - Mechanism: polymerase in a ZMW reads a circular SMRTbell template repeatedly → CCS → HiFi read
 - Long (~10–25 kb) and accurate (Q30+) — circular consensus cancels random per-pass error
 - Gold standard for de novo assembly, phasing, and full-length amplicons
+- *Image (right):* PacBio SMRT Cell consumable (`images/images_PacBio/pacbio-smrtcell.png`)
 - *Speaker note:* The accurate long-read platform. Zero-mode waveguide (ZMW) = nanoscale well that
   illuminates only the polymerase's active site. SMRTbell = hairpin-capped circular template. Many
   passes → CCS → Q30+. Trade-off: more expensive and lower throughput than Illumina, pairs with
@@ -109,6 +114,7 @@ Design → QC → Preprocess → [ALIGN ⟋ ASSEMBLE] → Downstream → Interpr
 - Amplify V1–V9 (~1,500 bp) with dual-barcoded primers → pool → SMRTbell library → HiFi sequence
 - Full-length reads → species/strain-level taxonomy (short V3–V4 cannot)
 - Dual index plate layout → up to 192 samples per run
+- *Image (right):* PacBio Revio + Vega instruments (`images/images_PacBio/pacbio-revio-vega.png`)
 - *Speaker note:* A real HiFi use-case. Stress the key insight: HiFi reads the **entire** 16S gene,
   so taxonomy resolves to species or even strain. Short Illumina reads cover only V3–V4 and top out
   at genus. This is the practical payoff of long + accurate reads.
@@ -126,6 +132,7 @@ Design → QC → Preprocess → [ALIGN ⟋ ASSEMBLE] → Downstream → Interpr
 - Direct-from-colony: pick colony → Rapid PCR Barcoding Kit → 24 barcoded samples → load R10.4.1 flow cell
 - MinKNOW real-time HAC basecalling → EPI2ME wf-bacterial-genomes → Flye assembly + Medaka polish
 - Output: species ID + serotype + MLST + AMR profile — no DNA extraction required
+- *Image (right):* Oxford Nanopore "rapid Salmonella serotyping" protocol-overview banner (`images/images_MinION/minion-salmonella-hero.png`)
 - *Speaker note:* A real end-to-end ONT workflow that threads every idea from the branch together.
   Key teaching points: (1) library prep skips DNA extraction entirely (direct-from-colony); (2) real-time
   basecalling means you watch results arrive; (3) this is the ASSEMBLE branch — the genome is
@@ -169,6 +176,7 @@ Design → QC → Preprocess → [ALIGN ⟋ ASSEMBLE] → Downstream → Interpr
 - Per-base quality, adapter content, overrepresented seqs, duplication, GC
 - Pass/Warn/Fail = a prompt, not a verdict
 - Make the GC second-peak explicit: screen contamination with Kraken2/Bracken
+- *Image (right):* FastQC per-base sequence quality plot — quality decaying at the 3' end (`images/images_QC/FastQC_seq_qual.png`)
 - *Speaker note:* "Read FastQC like a doctor reads a chart" — interpret in context of library type.
   A GC second peak only hints at contamination; a taxonomic screen (Kraken2) confirms the sample is
   your target species. Full profiling is Module 3c.
@@ -176,9 +184,11 @@ Design → QC → Preprocess → [ALIGN ⟋ ASSEMBLE] → Downstream → Interpr
 **Slide 23 — MultiQC: aggregate & spot the outlier**
 - One report, all samples, every step
 - The outlier view is the payoff
+- *Image (right):* MultiQC General Statistics table — 8 RNA-seq samples, heatmap columns (`images/images_QC/multiqc_overview.png`)
 - *Speaker note:* Highest value / lowest effort tool in the course. Run after every batch step.
 
 **Slide 24 — [new] Long reads need different QC tools**
+- *Image (right):* Nanoplot read-length histogram (`images/gtn/nanoplot-readlength.png`, GTN CC-BY)
 - FastQC's plots assume short, fixed-length reads
 - Nanoplot — read-length × quality (the long-read analog of the FastQC panels)
 - PycoQC — Nanopore run health: per-channel activity, yield over time, basecall quality
@@ -218,6 +228,7 @@ Design → QC → Preprocess → [ALIGN ⟋ ASSEMBLE] → Downstream → Interpr
 - *Speaker note:* The decision rule = does a trustworthy reference exist?
 
 **Slide 30 — Aligners**
+- *Image (right):* reads-vs-reference mapping schematic (`images/gtn/mapping.png`, GTN CC-BY)
 - BWA-MEM (DNA/variants), Bowtie2 (general/ChIP), minimap2 (long reads)
 - Right reference, indexed, documented
 - *Speaker note:* Spliced RNA aligners (STAR/HISAT2) are a special case → Module 3b.
@@ -244,6 +255,7 @@ Design → QC → Preprocess → [ALIGN ⟋ ASSEMBLE] → Downstream → Interpr
   = the same short+long combination Unicycler automates.
 
 **Slide 34 — Judging an assembly: N50 & friends**
+- *Image (right):* Bandage SPAdes assembly graph — long contigs + a repeat tangle (`images/gtn/bandage-assembly-graph.png`, GTN CC-BY)
 - # contigs, N50 (contiguity), total length, completeness (BUSCO/CheckV)
 - Merqury (k-mer QV, reference-free), Bandage (look at the assembly graph)
 - N50 rewards length, NOT correctness → always pair with completeness
@@ -338,6 +350,7 @@ Design → QC → Preprocess → [ALIGN ⟋ ASSEMBLE] → Downstream → Interpr
   defensible — pick one and report it (limma-voom is the GTN default).
 
 **Slide 49 — Multiple testing & the volcano**
+- *Image (right):* volcano plot — Down / Not-Sig / Up genes (`images/gtn/volcanoplot.png`, GTN CC-BY)
 - ~20k genes → ~1000 false "hits" at p<0.05; use BH FDR (padj)
 - Combine padj threshold WITH effect size; volcano/MA plots
 - *Speaker note:* Significant ≠ meaningful (padj 1e-30, log2FC 0.08). Big idea.
@@ -364,6 +377,7 @@ Design → QC → Preprocess → [ALIGN ⟋ ASSEMBLE] → Downstream → Interpr
 - *Speaker note:* Phage prep is mostly host DNA; also a privacy step for human samples.
 
 **Slide 53 — [new] Binning → MAGs (the bacterial side)**
+- *Image (right):* Contigs → Binning → Bin 1/2/3 diagram (`images/gtn/binning.png`, GTN CC-BY)
 - The same assembly feeds the bacterial side, not just viruses
 - MetaBAT2/MaxBin2 (bin) → DAS Tool/Binette (reconcile) → CheckM (quality) → dRep (de-dup)
 - Groups contigs into MAGs by tetranucleotide signature + coverage
@@ -381,6 +395,7 @@ Design → QC → Preprocess → [ALIGN ⟋ ASSEMBLE] → Downstream → Interpr
 - *Speaker note:* Report phages with their CheckV tier. 18% contamination ≈ host on a prophage.
 
 **Slide 56 — Taxonomy: Kraken2 + Bracken (+ MetaPhlAn)**
+- *Image (right):* Krona multi-layered taxonomy pie chart (`images/gtn/krona-taxonomy.png`, GTN CC-BY)
 - Kraken2 classifies reads; Bracken re-estimates abundance
 - MetaPhlAn — marker-gene alternative (cleaner species/strain, smaller DB); cross-check
 - Database caveat: novel phages = unclassified (that's the interesting bit)
@@ -411,6 +426,7 @@ Design → QC → Preprocess → [ALIGN ⟋ ASSEMBLE] → Downstream → Interpr
 - *Speaker note:* Pipeline exiting 0 means it ran, not that it's right.
 
 **Slide 60 — Visualization & stats per domain**
+- *Image (right):* JBrowse — reads piled under a variant call (`images/gtn/jbrowse-variants.png`, GTN CC-BY)
 - IGV / JBrowse2 (variants — strand/end/homopolymer artifacts; JBrowse2 = shareable)
 - Volcano/MA/PCA (RNA-seq), genome maps/Krona (phage), Circos (SV/CNV/comparative)
 - Effect size + significance; multiple testing everywhere; differential ≠ functional
@@ -432,6 +448,7 @@ Design → QC → Preprocess → [ALIGN ⟋ ASSEMBLE] → Downstream → Interpr
 - *Speaker note:* Not a final step — the box around the whole skeleton.
 
 **Slide 63 — Workflow managers & environments**
+- *Image (right):* Galaxy workflow editor — declare a pipeline visually (`images/gtn/galaxy-workflow-editor.png`, GTN CC-BY)
 - Nextflow + nf-core (sarek=3a, rnaseq=3b, mag=3c) | Snakemake (Pythonic, file rules)
 - conda/mamba (pin versions!) + containers (Docker/Singularity/Apptainer)
 - *Speaker note:* THE punchline — everything you did by hand, nf-core runs for you; now you can

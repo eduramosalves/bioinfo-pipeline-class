@@ -1,0 +1,4 @@
+Sample	Cutadapt	FastQC
+Cutadapt	1.9.1	
+FastQC: raw		0.11.2
+FastQC: trimmed		0.11.2

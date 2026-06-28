@@ -102,30 +102,37 @@ Design → QC → Preprocess → Core (ALIGN / ASSEMBLE) → Downstream → Inte
 
 <p class="eyebrow">MODULE 0 · SHORT-READ SPOTLIGHT</p>
 
+![bg right:34%](images/images_illumina/hires-miseqdx-right.jpg)
+![bg right:34%](images/images_illumina/hires-miseq-flowcell-side.jpg)
+
 ## Illumina: the high-accuracy workhorse
 
 - Fragment → ligate P5/P7 adapters + index → bridge-amplify → **SBS** → FASTQ
 - Highest accuracy (Q30+), highest throughput, cheapest per base; paired-end
 - Short-read limit: cannot span long repeats or large structural variants
 
-<!-- The short-read workhorse. Walk the four-step loop: library prep → cluster amplification → SBS imaging → FASTQ. Sell the strengths, then be honest about the limit: short reads can't span repeats, which is exactly why this branch uses BWA/Bowtie2 + SPAdes/MEGAHIT. -->
+<!-- The short-read workhorse. Right column: the Illumina MiSeqDx sequencer (top) + its flow-cell consumable (bottom). Walk the four-step loop: library prep → cluster amplification → SBS imaging → FASTQ. Sell the strengths, then be honest about the limit: short reads can't span repeats, which is exactly why this branch uses BWA/Bowtie2 + SPAdes/MEGAHIT. -->
 
 ---
 
 <p class="eyebrow">MODULE 0 · SBS WORKFLOW</p>
 
+![bg right:50% fit](images/images_illumina/illumina-sbs-workflow.jpg)
+
 ## Illumina SBS: step by step
 
-- **(A)** Library prep — fragment gDNA + ligate P5/P7 adapters + sample index onto both ends
-- **(B)** Cluster amplification — bridge-amplify each fragment into a clonal cluster on the flow cell
-- **(C)** Sequencing-by-synthesis — add one fluorescent reversible-terminator per cycle → image → cleave → repeat
-- **(D)** Alignment & analysis — align reads to reference → call variants / counts
+- **(A) Library prep** — fragment + ligate P5/P7 adapters + index
+- **(B) Cluster amplification** — bridge-amplify → clonal clusters
+- **(C) Sequencing-by-synthesis** — 1 reversible terminator / cycle → image → cleave → repeat
+- **(D) Alignment & analysis** — align reads → call variants / counts
 
-<!-- The real SBS methodology in the order it runs. Emphasize that the index enables multiplexing. The cluster step is why signal is detectable — one molecule is invisible; a clonal cluster is not. -->
+<!-- The four-panel figure (right) IS the A→D walkthrough. The index enables multiplexing; the cluster step is why signal is detectable — one molecule is invisible, a clonal cluster is not. -->
 
 ---
 
 <p class="eyebrow">MODULE 0 · SBS — STEP A IN DETAIL</p>
+
+![bg right:38% fit](images/images_illumina/illumina-library-prep.jpg)
 
 ## Library prep: adapters on every fragment
 
@@ -145,6 +152,8 @@ Design → QC → Preprocess → Core (ALIGN / ASSEMBLE) → Downstream → Inte
 
 <p class="eyebrow">MODULE 0 · ILLUMINA ARRAY GENOTYPING</p>
 
+![bg right:30% fit](images/images_illumina/illumina-genotyping-workflow.jpg)
+
 ## Illumina genotyping array: a different workflow
 
 - **BeadArray SNP genotyping — not SBS**
@@ -161,6 +170,8 @@ Design → QC → Preprocess → Core (ALIGN / ASSEMBLE) → Downstream → Inte
 
 <p class="eyebrow">MODULE 0 · LONG-READ SPOTLIGHT</p>
 
+![bg right:36%](images/images_PacBio/pacbio-smrtcell.png)
+
 ## PacBio HiFi: long AND accurate
 
 - Polymerase in a **ZMW** reads a circular **SMRTbell** template repeatedly → **CCS** → HiFi read
@@ -172,6 +183,8 @@ Design → QC → Preprocess → Core (ALIGN / ASSEMBLE) → Downstream → Inte
 ---
 
 <p class="eyebrow">MODULE 0 · HIFI IN PRACTICE</p>
+
+![bg right:30% fit](images/images_PacBio/pacbio-revio-vega.png)
 
 ## PacBio HiFi in practice: full-length 16S profiling
 
@@ -200,6 +213,8 @@ Design → QC → Preprocess → Core (ALIGN / ASSEMBLE) → Downstream → Inte
 ---
 
 <p class="eyebrow">MODULE 0 · ONT IN PRACTICE</p>
+
+![bg right:36% fit](images/images_MinION/minion-salmonella-hero.png)
 
 ## MinION in practice: Salmonella colony → serotype same day
 
@@ -282,6 +297,8 @@ Design → [QC] → [PREPROCESS] → Core → Downstream → Interpret → Repro
 
 ---
 
+![bg right:42% fit](images/images_QC/FastQC_seq_qual.png)
+
 ## FastQC: the metrics that matter
 
 - Per-base quality · adapter content · overrepresented seqs · duplication · GC
@@ -291,6 +308,8 @@ Design → [QC] → [PREPROCESS] → Core → Downstream → Interpret → Repro
 <!-- "Read FastQC like a doctor reads a chart" — interpret in the context of the library type. A GC second peak only hints at contamination; a taxonomic screen (Kraken2) confirms the sample is your target species. Full profiling is Module 3c. -->
 
 ---
+
+![bg right:48% fit](images/images_QC/multiqc_overview.png)
 
 ## MultiQC: aggregate & spot the outlier
 
@@ -302,6 +321,8 @@ Design → [QC] → [PREPROCESS] → Core → Downstream → Interpret → Repro
 ---
 
 <p class="eyebrow">MODULE 1 · LONG-READ QC</p>
+
+![bg right:42% fit](images/gtn/nanoplot-readlength.png)
 
 ## Long reads need different QC tools
 
@@ -373,6 +394,8 @@ Design → QC → Preprocess → [ ALIGN / ASSEMBLE ] → Downstream → Interpr
 
 ---
 
+![bg right:40% fit](images/gtn/mapping.png)
+
 ## Aligners
 
 - **BWA-MEM** (DNA / variants) · **Bowtie2** (general / ChIP) · **minimap2** (long reads)
@@ -418,6 +441,8 @@ samtools index s.bam ; samtools flagstat s.bam
 <!-- Two steps short-read work doesn't have. Hybrid in disguise: long-read assemble, then short-read polish (Pilon/Polypolish) = the same short+long combination Unicycler automates. -->
 
 ---
+
+![bg right:38% fit](images/gtn/bandage-assembly-graph.png)
 
 ## Judging an assembly: N50 & friends
 
@@ -602,6 +627,8 @@ GENE_B      2      0       3       1
 
 ---
 
+![bg right:36% fit](images/gtn/volcanoplot.png)
+
 ## Multiple testing & the volcano
 
 - ~20k genes → ~1000 false "hits" at p<0.05 → use **BH FDR (padj)**
@@ -654,6 +681,8 @@ GENE_B      2      0       3       1
 
 <p class="eyebrow">MODULE 3c · THE BACTERIAL SIDE</p>
 
+![bg right:40% fit](images/gtn/binning.png)
+
 ## Binning → MAGs
 
 - The same assembly feeds the **bacterial** side, not just viruses
@@ -684,6 +713,8 @@ GENE_B      2      0       3       1
 <!-- Report phages with their CheckV quality tier. -->
 
 ---
+
+![bg right:38% fit](images/gtn/krona-taxonomy.png)
 
 ## Taxonomy: Kraken2 + Bracken
 
@@ -734,6 +765,8 @@ GENE_B      2      0       3       1
 
 ---
 
+![bg right:34% fit](images/gtn/jbrowse-variants.png)
+
 ## Visualization & stats per domain
 
 - **IGV** / **JBrowse2** (variants — strand / end / homopolymer artifacts; JBrowse2 = shareable)
@@ -771,6 +804,8 @@ GENE_B      2      0       3       1
 <!-- Not a final step — the box around the whole skeleton. -->
 
 ---
+
+![bg right:40% fit](images/gtn/galaxy-workflow-editor.png)
 
 ## Workflow managers & environments
 
