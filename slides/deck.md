@@ -105,6 +105,8 @@ Design → QC → Preprocess → Core (ALIGN / ASSEMBLE) → Downstream → Inte
 ![bg right:34%](images/images_illumina/hires-miseqdx-right.jpg)
 ![bg right:34%](images/images_illumina/hires-miseq-flowcell-side.jpg)
 
+<p class="src">Illumina (vendor figures)</p>
+
 ## Illumina: the high-accuracy workhorse
 
 - Fragment → ligate P5/P7 adapters + index → bridge-amplify → **SBS** → FASTQ
@@ -118,6 +120,8 @@ Design → QC → Preprocess → Core (ALIGN / ASSEMBLE) → Downstream → Inte
 <p class="eyebrow">MODULE 0 · SBS WORKFLOW</p>
 
 ![bg right:50% fit](images/images_illumina/illumina-sbs-workflow.jpg)
+
+<p class="src">Illumina — SBS workflow</p>
 
 ## Illumina SBS: step by step
 
@@ -133,6 +137,8 @@ Design → QC → Preprocess → Core (ALIGN / ASSEMBLE) → Downstream → Inte
 <p class="eyebrow">MODULE 0 · SBS — STEP A IN DETAIL</p>
 
 ![bg right:38% fit](images/images_illumina/illumina-library-prep.jpg)
+
+<p class="src">Illumina</p>
 
 ## Library prep: adapters on every fragment
 
@@ -154,6 +160,8 @@ Design → QC → Preprocess → Core (ALIGN / ASSEMBLE) → Downstream → Inte
 
 ![bg right:30% fit](images/images_illumina/illumina-genotyping-workflow.jpg)
 
+<p class="src">Illumina — Infinium array</p>
+
 ## Illumina genotyping array: a different workflow
 
 - **BeadArray SNP genotyping — not SBS**
@@ -172,6 +180,8 @@ Design → QC → Preprocess → Core (ALIGN / ASSEMBLE) → Downstream → Inte
 
 ![bg right:36%](images/images_PacBio/pacbio-smrtcell.png)
 
+<p class="src">PacBio — SMRT Cell</p>
+
 ## PacBio HiFi: long AND accurate
 
 - Polymerase in a **ZMW** reads a circular **SMRTbell** template repeatedly → **CCS** → HiFi read
@@ -185,6 +195,8 @@ Design → QC → Preprocess → Core (ALIGN / ASSEMBLE) → Downstream → Inte
 <p class="eyebrow">MODULE 0 · HIFI IN PRACTICE</p>
 
 ![bg right:30% fit](images/images_PacBio/pacbio-revio-vega.png)
+
+<p class="src">PacBio — Revio / Vega</p>
 
 ## PacBio HiFi in practice: full-length 16S profiling
 
@@ -214,13 +226,15 @@ Design → QC → Preprocess → Core (ALIGN / ASSEMBLE) → Downstream → Inte
 
 <p class="eyebrow">MODULE 0 · ONT IN PRACTICE</p>
 
-![bg right:36% fit](images/images_MinION/minion-salmonella-hero.png)
+![bg right:38% fit](images/images_MinION/minion-salmonella-hero.png)
+
+<p class="src">Oxford Nanopore</p>
 
 ## MinION in practice: Salmonella colony → serotype same day
 
-- **Direct-from-colony**: pick colony → Rapid PCR Barcoding Kit (SQK-RPB114.24) → 24 barcoded samples → R10.4.1 flow cell
-- MinKNOW real-time HAC basecalling → EPI2ME `wf-bacterial-genomes` → Flye assembly + Medaka polish
-- Output: species ID + serotype + 7-gene MLST + AMR profile — **no DNA extraction required**
+- **Direct-from-colony**: colony → Rapid PCR Barcoding (SQK-RPB114.24) → 24 barcodes → R10.4.1 flow cell
+- MinKNOW real-time HAC basecalling → EPI2ME `wf-bacterial-genomes` → Flye + Medaka polish
+- Output: species ID + serotype + 7-gene MLST + AMR — **no DNA extraction**
 
 > This is the ASSEMBLE branch in action — the genome is reconstructed de novo.
 
@@ -299,6 +313,8 @@ Design → [QC] → [PREPROCESS] → Core → Downstream → Interpret → Repro
 
 ![bg right:42% fit](images/images_QC/FastQC_seq_qual.png)
 
+<p class="src">FastQC · Babraham Bioinformatics (GPL)</p>
+
 ## FastQC: the metrics that matter
 
 - Per-base quality · adapter content · overrepresented seqs · duplication · GC
@@ -309,7 +325,9 @@ Design → [QC] → [PREPROCESS] → Core → Downstream → Interpret → Repro
 
 ---
 
-![bg right:48% fit](images/images_QC/multiqc_overview.png)
+![bg right:52% fit](images/images_QC/multiqc_overview.png)
+
+<p class="src">MultiQC example report · GPLv3</p>
 
 ## MultiQC: aggregate & spot the outlier
 
@@ -323,6 +341,8 @@ Design → [QC] → [PREPROCESS] → Core → Downstream → Interpret → Repro
 <p class="eyebrow">MODULE 1 · LONG-READ QC</p>
 
 ![bg right:42% fit](images/gtn/nanoplot-readlength.png)
+
+<p class="src">Nanoplot · GTN, CC-BY 4.0</p>
 
 ## Long reads need different QC tools
 
@@ -338,13 +358,16 @@ Design → [QC] → [PREPROCESS] → Core → Downstream → Interpret → Repro
 
 ## Trimming tools
 
-| Tool | Role |
-|------|------|
-| **fastp** | **default** — all-in-one: adapters, quality, length + report |
-| **Trimmomatic** | explicit / legacy, fine control |
-| **cutadapt** | adapter / primer specialist |
+<table>
+<thead><tr><th>Tool</th><th>Role</th></tr></thead>
+<tbody>
+<tr class="hi"><td><strong>fastp</strong></td><td><strong>default</strong> — all-in-one: adapters, quality, length + its own report</td></tr>
+<tr><td><strong>Trimmomatic</strong></td><td>explicit / legacy, fine-grained control</td></tr>
+<tr><td><strong>cutadapt</strong></td><td>adapter / primer specialist</td></tr>
+</tbody>
+</table>
 
-<!-- fastp = one fast pass + its own report. Show the table; default to fastp. -->
+<!-- fastp = one fast pass + its own report. Show the table; default to fastp (the tinted row). -->
 
 ---
 
@@ -394,7 +417,9 @@ Design → QC → Preprocess → [ ALIGN / ASSEMBLE ] → Downstream → Interpr
 
 ---
 
-![bg right:40% fit](images/gtn/mapping.png)
+![bg right:46% fit](images/gtn/mapping.png)
+
+<p class="src">GTN · CC-BY 4.0</p>
 
 ## Aligners
 
@@ -442,7 +467,9 @@ samtools index s.bam ; samtools flagstat s.bam
 
 ---
 
-![bg right:38% fit](images/gtn/bandage-assembly-graph.png)
+![bg right:40% fit](images/gtn/busco-assessment.png)
+
+<p class="src">BUSCO via MultiQC · GTN, CC-BY 4.0</p>
 
 ## Judging an assembly: N50 & friends
 
@@ -594,15 +621,17 @@ chr7  ...  . G   A   312  PASS   DP=54  GT:AD:DP 0/1:27,27:54
 
 ## The count matrix
 
-```
-        ctrl_1 ctrl_2 treat_1 treat_2
-GENE_A    412    388     820     795
-GENE_B      2      0       3       1
-```
+<table>
+<thead><tr><th>Gene</th><th>ctrl_1</th><th>ctrl_2</th><th>treat_1</th><th>treat_2</th></tr></thead>
+<tbody>
+<tr><td><strong>GENE_A</strong></td><td>412</td><td>388</td><td>820</td><td>795</td></tr>
+<tr class="hi"><td><strong>GENE_B</strong></td><td>2</td><td>0</td><td>3</td><td>1</td></tr>
+</tbody>
+</table>
 
-- genes × samples — **filter low-count genes** before testing
+- genes × samples — **filter low-count genes** first (e.g. the flagged **GENE_B**: noisy, no power)
 
-<!-- The convergence point: both routes end here; it's the DE input. -->
+<!-- The convergence point: both routes end here; it's the DE input. GENE_B is the low-count row you'd drop before testing. -->
 
 ---
 
@@ -628,6 +657,8 @@ GENE_B      2      0       3       1
 ---
 
 ![bg right:36% fit](images/gtn/volcanoplot.png)
+
+<p class="src">GTN · CC-BY 4.0</p>
 
 ## Multiple testing & the volcano
 
@@ -683,6 +714,8 @@ GENE_B      2      0       3       1
 
 ![bg right:40% fit](images/gtn/binning.png)
 
+<p class="src">GTN · CC-BY 4.0</p>
+
 ## Binning → MAGs
 
 - The same assembly feeds the **bacterial** side, not just viruses
@@ -714,7 +747,9 @@ GENE_B      2      0       3       1
 
 ---
 
-![bg right:38% fit](images/gtn/krona-taxonomy.png)
+![bg right:42% fit](images/gtn/krona-taxonomy.png)
+
+<p class="src">Krona · GTN, CC-BY 4.0</p>
 
 ## Taxonomy: Kraken2 + Bracken
 
@@ -767,6 +802,8 @@ GENE_B      2      0       3       1
 
 ![bg right:34% fit](images/gtn/jbrowse-variants.png)
 
+<p class="src">JBrowse · GTN, CC-BY 4.0</p>
+
 ## Visualization & stats per domain
 
 - **IGV** / **JBrowse2** (variants — strand / end / homopolymer artifacts; JBrowse2 = shareable)
@@ -805,7 +842,9 @@ GENE_B      2      0       3       1
 
 ---
 
-![bg right:40% fit](images/gtn/galaxy-workflow-editor.png)
+![bg right:46% fit](images/gtn/nfcore-rnaseq-metromap.png)
+
+<p class="src">nf-core/rnaseq · CC-BY</p>
 
 ## Workflow managers & environments
 
@@ -825,6 +864,21 @@ GENE_B      2      0       3       1
 > The reproducibility test: could you (or someone) regenerate these exact results in 2 years?
 
 <!-- Recap the skeleton one last time; point them to the hands-on lab. Close. -->
+
+---
+
+<p class="eyebrow">ATTRIBUTION</p>
+
+## Image credits
+
+- **Galaxy Training Network** diagrams — **CC-BY 4.0** (Batut et al. 2018): mapping · Nanoplot · BUSCO · volcano · binning · Krona · JBrowse
+- **nf-core/rnaseq** metro map — nf-core (CC-BY)
+- **Illumina** · **PacBio** · **Oxford Nanopore** — vendor figures & protocol, educational use
+- **FastQC** — Babraham Bioinformatics (GPL) · **MultiQC** example report — GPLv3 (Ewels et al. 2016)
+
+> Full per-image sources: `slides/images/CREDITS.md`.
+
+<!-- Attribution. GTN diagrams are CC-BY; vendor figures are third-party (educational use) — swap for openly-licensed equivalents to redistribute. -->
 
 ---
 

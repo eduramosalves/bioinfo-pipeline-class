@@ -93,18 +93,35 @@ blockquote {
 blockquote strong { color:var(--teal-ink); }
 
 /* ---- tables (scoped under `section` to beat the default theme) ---- */
-section table { border-collapse:collapse; font-size:20px; width:100%; table-layout:fixed; }
-section th, section td {
-  border:1px solid var(--surface-border); padding:8px 14px; text-align:left;
-  vertical-align:top; white-space:normal; overflow-wrap:anywhere; word-break:normal;
-  color:var(--fg);
+section table {
+  border-collapse:separate; border-spacing:0; font-size:22px; width:100%;
+  table-layout:fixed; border:1px solid var(--surface-border); border-radius:12px;
+  overflow:hidden; box-shadow:var(--shadow-card);
 }
+section th, section td {
+  border-bottom:1px solid var(--surface-border); padding:12px 18px; text-align:left;
+  vertical-align:middle; white-space:normal; overflow-wrap:anywhere; word-break:normal;
+  color:var(--fg); line-height:1.35;
+}
+section tr:last-child td { border-bottom:none; }
+/* zebra striping for readability */
+section tbody tr:nth-child(even) td { background:rgba(16,20,36,.035); }
+/* highlighted row (default tool / flagged matrix row) */
+section table tr.hi td { background:rgba(45,212,191,.16); font-weight:500; }
 section th {
-  font-family:var(--font-mono); text-transform:uppercase; letter-spacing:.05em;
-  color:var(--teal-ink); background:rgba(16,20,36,.03); font-weight:500; font-size:15px;
+  font-family:var(--font-mono); text-transform:uppercase; letter-spacing:.06em;
+  color:var(--teal-ink); background:rgba(13,148,136,.07); font-weight:600; font-size:15px;
+  border-bottom:2px solid rgba(13,148,136,.22);
 }
 /* let a leading narrow column (tool / module name) stay compact */
 section table th:first-child, section table td:first-child { width:26%; }
+
+/* ---- image source caption (tiny, muted, bottom-left margin) ---- */
+section .src {
+  position:absolute; left:72px; bottom:18px; margin:0;
+  font-family:var(--font-mono); font-size:13px; letter-spacing:.02em;
+  color:var(--muted); opacity:.85;
+}
 
 /* ---- pagination ---- */
 section::after { color:var(--muted); font-family:var(--font-mono); font-size:14px; }

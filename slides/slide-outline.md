@@ -255,7 +255,7 @@ Design → QC → Preprocess → [ALIGN ⟋ ASSEMBLE] → Downstream → Interpr
   = the same short+long combination Unicycler automates.
 
 **Slide 34 — Judging an assembly: N50 & friends**
-- *Image (right):* Bandage SPAdes assembly graph — long contigs + a repeat tangle (`images/gtn/bandage-assembly-graph.png`, GTN CC-BY)
+- *Image (right):* BUSCO completeness assessment — Complete / Fragmented / Missing across assemblies (`images/gtn/busco-assessment.png`, GTN CC-BY)
 - # contigs, N50 (contiguity), total length, completeness (BUSCO/CheckV)
 - Merqury (k-mer QV, reference-free), Bandage (look at the assembly graph)
 - N50 rewards length, NOT correctness → always pair with completeness
@@ -448,7 +448,7 @@ Design → QC → Preprocess → [ALIGN ⟋ ASSEMBLE] → Downstream → Interpr
 - *Speaker note:* Not a final step — the box around the whole skeleton.
 
 **Slide 63 — Workflow managers & environments**
-- *Image (right):* Galaxy workflow editor — declare a pipeline visually (`images/gtn/galaxy-workflow-editor.png`, GTN CC-BY)
+- *Image (right):* nf-core/rnaseq metro map — the pipeline as a subway diagram (`images/gtn/nfcore-rnaseq-metromap.png`, nf-core CC-BY)
 - Nextflow + nf-core (sarek=3a, rnaseq=3b, mag=3c) | Snakemake (Pythonic, file rules)
 - conda/mamba (pin versions!) + containers (Docker/Singularity/Apptainer)
 - *Speaker note:* THE punchline — everything you did by hand, nf-core runs for you; now you can
@@ -459,12 +459,23 @@ Design → QC → Preprocess → [ALIGN ⟋ ASSEMBLE] → Downstream → Interpr
 - The reproducibility test: could you/someone regenerate this in 2 years?
 - *Speaker note:* Recap the skeleton one last time; point them to the hands-on lab. Close.
 
+**Slide 65 — Image credits** *(before the closing "Thank you" slide)*
+- Galaxy Training Network diagrams — CC-BY 4.0 (Batut et al. 2018); nf-core/rnaseq — CC-BY
+- Illumina / PacBio / Oxford Nanopore — vendor figures & protocol (educational use)
+- FastQC (GPL) · MultiQC example report (GPLv3)
+- *Speaker note:* Attribution slide. Full per-image sources in `slides/images/CREDITS.md`. Vendor
+  figures are third-party; swap for openly-licensed equivalents to redistribute.
+
 ---
 
 ### Delivery notes
-- **Full survey:** all 64 slides, ~4–5 h with the checkpoint discussion beats.
-- **Focused session (~2 h):** Slides 1–35 (through Module 2) + ONE of {3a, 3b, 3c} + 59–64. Drop the
+- **Full survey:** all 65 content slides + closing slide, ~4–5 h with the checkpoint discussion beats.
+- **Focused session (~2 h):** Slides 1–35 (through Module 2) + ONE of {3a, 3b, 3c} + 59–65. Drop the
   other two domain blocks.
+- **Images & credits.** Image slides carry a small per-image source caption (`.src`) bottom-left;
+  full attribution is on the **Image credits** slide and in `slides/images/CREDITS.md`. The three
+  "tables" (Trimming tools, Mapping domains, count matrix) use the polished CSS table style
+  (zebra rows, highlighted row) from `theme/brand.css`.
 - The [skeleton] skeleton slides are your navigation anchors — never skip them; they're how the audience
   keeps orientation across a long session.
 - **Galaxy (GUI) companion.** Each module's speaker notes in `deck.md` carry a "GUI alternative (GTN)"

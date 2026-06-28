@@ -12,12 +12,17 @@ community. Fetched 2026-06-28.
 |----------------------|-------|--------------------------|
 | `mapping.png` | 30 Aligners | `sequence-analysis/images/mapping/mapping.png` |
 | `nanoplot-readlength.png` | 24 Long-read QC | `sequence-analysis/images/quality-control/HistogramReadlength.png` |
-| `bandage-assembly-graph.png` | 34 Judging an assembly | `assembly/images/bandage_spades.svg` (rasterized) |
+| `busco-assessment.png` | 34 Judging an assembly | `assembly/images/denovo_assembly/busco_plot_bacillales_odb10.png` |
 | `volcanoplot.png` | 49 Multiple testing & the volcano | `transcriptomics/images/rna-seq-viz-with-volcanoplot/volcanoplot.png` |
 | `binning.png` | 53 Binning → MAGs | `microbiome/tutorials/metagenomics-binning/images/binning.png` |
 | `krona-taxonomy.png` | 56 Taxonomy | `microbiome/tutorials/taxonomic-profiling/images/krona-kraken.png` |
 | `jbrowse-variants.png` | 60 Visualization | `variant-analysis/images/jbrowse2.png` |
-| `galaxy-workflow-editor.png` | 63 Workflow managers | `galaxy-interface/images/workflow_editor_new_workflow.png` |
+
+## nf-core — CC-BY
+
+| File (`images/gtn/`) | Slide | Source / license |
+|----------------------|-------|------------------|
+| `nfcore-rnaseq-metromap.png` | 63 Workflow managers | nf-core/rnaseq metro map — <https://github.com/nf-core/rnaseq> `docs/images/nf-core-rnaseq_metro_map_grey.png` (nf-core; diagram CC-BY, pipeline MIT) |
 
 ## Tool-output screenshots
 
