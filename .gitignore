@@ -3,3 +3,6 @@
 
 # Claude Design export archives (redundant with the extracted project folder)
 *.zip
+
+# Raw MultiQC report data (heavy; only the slide screenshot is kept)
+slides/images/**/multiqc_report/

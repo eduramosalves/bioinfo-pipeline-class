@@ -24,7 +24,7 @@ community. Fetched 2026-06-28.
 | File | Slide | Source / license |
 |------|-------|------------------|
 | `images_QC/FastQC_seq_qual.png` | 22 FastQC | FastQC (Babraham Bioinformatics, GPL) "Per base sequence quality" plot |
-| `images_QC/multiqc_overview.png` | 23 MultiQC | Screenshot of the [MultiQC](https://multiqc.info/) example RNA-seq report (Seqera; MultiQC GPLv3 / Ewels et al. 2016). Captured locally in light theme. |
+| `images_QC/multiqc_overview.png` | 23 MultiQC | Screenshot of the [MultiQC](https://multiqc.info/) example RNA-seq report (Seqera; MultiQC GPLv3 / Ewels et al. 2016), captured in light theme. The raw report data is not stored in-repo (gitignored). |
 
 ## Oxford Nanopore Technologies
 
