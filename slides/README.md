@@ -7,9 +7,10 @@ Two files:
 - **`deck.md`** — the renderable [Marp](https://marp.app/) deck built from the outline, themed with
   `theme/brand.css`. Edit this for *delivery*.
 - **`theme/brand.css`** — Marp theme mirroring the brand system
-  (`~/estudio/knowledge/brandbook.md` v1.0 + `~/estudio/templates/brand-tokens.css`): scientific
-  dark, teal→violet, **Exo / Roboto Mono**, glass surfaces, and **SVG icons only — no emoji**. The
-  recurring "skeleton" navigation slides carry an inline Lucide `workflow` icon (CSS mask).
+  (`~/estudio/knowledge/brandbook-light.md` v1.0 + `~/estudio/templates/brand-light-tokens.css`):
+  scientific **light**, teal→violet (ink tones for text on white), **Exo / Roboto Mono**, soft-shadow
+  surfaces, and **SVG icons only — no emoji**. The recurring "skeleton" navigation slides carry an
+  inline Lucide `workflow` icon (CSS mask).
 
 ## Build
 
@@ -42,6 +43,8 @@ The VS Code **Marp for VS Code** extension gives the same preview inline — poi
 
 ## Brand alignment
 
-Per `decisões-fixas.md`, slides must follow the brandbook. The theme already encodes the tokens; if
-the brand system changes, update `theme/brand.css` to match `brand-tokens.css`. Keep it **dark mode,
-no emoji, no extra type families** (brandbook §8 anti-patterns).
+Per `decisões-fixas.md`, slides must follow the brandbook. The personal-brand default flipped to
+**light mode** on 2026-06-27 (`brandbook-light.md`); dark (`brandbook.md`) is now the alternative.
+The theme already encodes the light tokens; if the brand system changes, update `theme/brand.css` to
+match `brand-light-tokens.css`. Keep it **light mode, no emoji, no extra type families**
+(brandbook §8 anti-patterns).
