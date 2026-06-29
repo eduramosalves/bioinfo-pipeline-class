@@ -8,8 +8,9 @@ Sourced from the [GTN training-material](https://github.com/galaxyproject/traini
 (branch `main`), licensed **CC-BY 4.0**. Attribution: *Batut et al. 2018, Cell Systems* and the GTN
 community. Fetched 2026-06-28.
 
-| File (`images/gtn/`) | Slide | Source path in `topics/` |
+| File (`assets/`) | Slide | Source path in `topics/` |
 |----------------------|-------|--------------------------|
+| `fastqc-per-base-quality.png` | 22 FastQC | `sequence-analysis/images/quality-control/per_base_sequence_quality-before.png` |
 | `mapping.png` | 30 Aligners | `sequence-analysis/images/mapping/mapping.png` |
 | `nanoplot-readlength.png` | 24 Long-read QC | `sequence-analysis/images/quality-control/HistogramReadlength.png` |
 | `busco-assessment.png` | 34 Judging an assembly | `assembly/images/denovo_assembly/busco_plot_bacillales_odb10.png` |
@@ -24,12 +25,12 @@ community. Fetched 2026-06-28.
 |----------------------|-------|------------------|
 | `nfcore-rnaseq-metromap.png` | 63 Workflow managers | nf-core/rnaseq metro map — <https://github.com/nf-core/rnaseq> `docs/images/nf-core-rnaseq_metro_map_grey.png` (nf-core; diagram CC-BY, pipeline MIT) |
 
-## Tool-output screenshots
+## Tool-output figures
 
-| File | Slide | Source / license |
+| File (`assets/`) | Slide | Source / license |
 |------|-------|------------------|
-| `images_QC/FastQC_seq_qual.png` | 22 FastQC | FastQC (Babraham Bioinformatics, GPL) "Per base sequence quality" plot |
-| `images_QC/multiqc_overview.png` | 23 MultiQC | Screenshot of the [MultiQC](https://multiqc.info/) example RNA-seq report (Seqera; MultiQC GPLv3 / Ewels et al. 2016), captured in light theme. The raw report data is not stored in-repo (gitignored). |
+| `multiqc-general-stats.png` | 23 MultiQC | [MultiQC](https://multiqc.info/) "General Statistics" table — `docs/images/genstats_grouping_ungrouped.png` from the [MultiQC repo](https://github.com/MultiQC/MultiQC) (**GPL-3.0** / Ewels et al. 2016, *Bioinformatics*). |
+| `pharokka-genome-map.png` | 56 Pharokka | Pharokka circular phage genome map — `img/SAOMS1_plot.png` from the [Pharokka repo](https://github.com/gbouras13/pharokka) (**MIT** / Bouras et al. 2023, *Bioinformatics*). *Staphylococcus* phage SAOMS1 (GenBank **MW460250.1**; isolated by Yerushalmy et al., Hebrew University). |
 
 ## Oxford Nanopore Technologies
 

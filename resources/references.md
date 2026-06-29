@@ -97,6 +97,7 @@ All canonical specs live at https://samtools.github.io/hts-specs/ — SAM/BAM, C
 ## Datasets for teaching / the lab
 - **E. coli K-12 MG1655 reference** — NCBI RefSeq **NC_000913.3**
 - **Phage lambda reference** — NCBI **NC_001416.1** (~48.5 kb)
+- ***Staphylococcus* phage SAOMS1** — NCBI **MW460250.1** (the genome shown in the slide-56 Pharokka map)
 - **NCBI SRA / ENA** — public raw reads: https://www.ncbi.nlm.nih.gov/sra · https://www.ebi.ac.uk/ena
 - **nf-core test datasets** — small, curated inputs for every nf-core pipeline: https://github.com/nf-core/test-datasets
 - **Zenodo** — archived datasets with DOIs: https://zenodo.org/
